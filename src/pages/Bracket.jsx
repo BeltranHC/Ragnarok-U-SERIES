@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRegistration } from '../context/RegistrationContext'
 import { fetchPublishedStages, fetchPublicTeams, publicUrl } from '../lib/tournamentApi'
 import RoomList from '../components/RoomList'
+import Collapse from '../components/Collapse'
 import PagePlaceholder from './PagePlaceholder'
 
 const description = 'El camino de cada equipo, desde sus primeros encuentros hasta la definición del torneo.'
@@ -79,6 +80,8 @@ function standings(teamIds, names, matches) {
   return [...rows.values()].sort((x, y) => y.points - x.points || y.diff - x.diff)
 }
 
+const STAGE_LABEL = { groups: 'Fase de grupos', single_elim: 'Eliminación directa', battle_royale: 'Battle Royale' }
+
 function StageView({ stage, data, teams }) {
   const matches = data.matches.filter((m) => m.stage_id === stage.id)
   if (stage.type === 'single_elim') {
@@ -142,7 +145,9 @@ function StageView({ stage, data, teams }) {
                   ))}
                 </tbody>
               </table>
-              <div className="pd-match-list">{gm.map((m) => <MatchBox match={m} key={m.id} />)}</div>
+              <Collapse title="Partidos" meta={`${gm.filter((m) => m.status === 'completed').length}/${gm.length} jugados`}>
+                <div className="pd-match-list">{gm.map((m) => <MatchBox match={m} key={m.id} />)}</div>
+              </Collapse>
             </section>
           )
         })}
@@ -172,8 +177,9 @@ function StageView({ stage, data, teams }) {
     <section className="pd-card">
       {roomTeams.length > 0 && (
         <div className="pd-rooms-block">
-          <h3>{rooms > 1 ? 'Salas y lugar de cada equipo' : 'Lugar de cada equipo en la sala'}</h3>
-          <RoomList teams={roomTeams} logoOf={(team) => publicUrl('team-logos', team.logo_path)} />
+          <Collapse title={rooms > 1 ? 'Salas y lugar de cada equipo' : 'Lugar de cada equipo en la sala'} meta={`${roomTeams.length} equipos`}>
+            <RoomList teams={roomTeams} logoOf={(team) => publicUrl('team-logos', team.logo_path)} />
+          </Collapse>
         </div>
       )}
       {championName && <p className="pd-champion"><span>Campeón</span><b>{championName}</b></p>}
@@ -227,12 +233,18 @@ function Bracket() {
       </div>
       {stages.length === 0 ? (
         <p className="pd-empty">La organización aún no publica el fixture de esta disciplina.</p>
-      ) : stages.map((stage) => (
-        <section className="pd-stage" key={stage.id}>
-          <h2>{stage.name}</h2>
-          <StageView stage={stage} data={data} teams={teams} />
-        </section>
-      ))}
+      ) : stages.map((stage, index) => {
+        const stageMatches = data.matches.filter((m) => m.stage_id === stage.id)
+        const played = stageMatches.filter((m) => m.status === 'completed').length
+        return (
+          <div className="pd-stage" key={stage.id}>
+            <Collapse variant="stage" title={stage.name} defaultOpen={index === stages.length - 1}
+              meta={`${STAGE_LABEL[stage.type] ?? ''}${stageMatches.length ? ` · ${played}/${stageMatches.length} ${stage.type === 'battle_royale' ? 'partidas' : 'partidos'}` : ''}`}>
+              <StageView stage={stage} data={data} teams={teams} />
+            </Collapse>
+          </div>
+        )
+      })}
     </main>
   )
 }

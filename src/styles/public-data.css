@@ -108,3 +108,23 @@
 .lv-links a { padding: .35rem .75rem; border-radius: 6px; background: #ffffff14; color: #fff; text-decoration: none; font-family: var(--font-body); font-size: .8rem; font-weight: 700; }
 .lv-links a:hover { background: #ef4444; }
 @media (max-width: 600px) { .lv-dock { left: .6rem; bottom: 4.6rem; } }
+
+/* Secciones plegables (fases, partidos, salas) */
+.cl-head { width: 100%; display: flex; align-items: center; gap: .9rem; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; font: inherit; }
+.cl-head:focus-visible { outline: 2px solid var(--a1); outline-offset: 2px; }
+.cl-head svg { flex: none; color: #94a3b8; transition: transform .25s; }
+.cl--open > .cl-head svg { transform: rotate(180deg); color: var(--a2); }
+.cl-title { font-family: var(--font-display); letter-spacing: .05em; text-transform: uppercase; }
+.cl-meta { margin-left: auto; color: #94a3b8; font-family: var(--font-body); font-size: .8rem; white-space: nowrap; }
+.cl-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+.cl--open > .cl-panel { grid-template-rows: 1fr; }
+.cl-inner { overflow: hidden; min-height: 0; }
+.cl--stage { border: 1px solid #ffffff1a; border-radius: 14px; background: #0d1220cc; }
+.cl--stage > .cl-head { padding: 1rem 1.2rem; }
+.cl--stage > .cl-head .cl-title { font-size: 1.15rem; color: #fff; }
+.cl--stage > .cl-panel > .cl-inner > * { margin: 0 1.2rem 1.2rem; }
+.cl--sub > .cl-head { padding: .5rem 0; border-top: 1px solid #ffffff12; }
+.cl--sub > .cl-head .cl-title { font-size: .8rem; color: #cbd5e1; }
+.cl--sub > .cl-panel > .cl-inner { padding-top: .4rem; }
+.pd-stage + .pd-stage { margin-top: 1rem; }
+@media (prefers-reduced-motion: reduce) { .cl-panel, .cl-head svg { transition: none; } }
