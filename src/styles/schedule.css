@@ -1,0 +1,22 @@
+/* Cronograma: días plegables con la agenda de partidos y eventos */
+.sc-days { max-width: 1000px; margin: 0 auto; display: grid; gap: 1rem; }
+.sc-today { margin-left: .7rem; padding: .15rem .55rem; border-radius: 999px; background: var(--a1); color: #fff; font-style: normal; font-family: var(--font-body); font-size: .62rem; font-weight: 700; letter-spacing: .14em; vertical-align: middle; }
+.sc-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.sc-item { display: grid; grid-template-columns: 5.2rem 1fr auto; gap: 1rem; align-items: center; padding: .85rem 0; border-top: 1px solid #ffffff10; }
+.sc-item:first-child { border-top: 0; }
+.sc-time { display: grid; font-family: var(--font-display); font-size: 1.45rem; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; }
+.sc-time small { margin-top: .25rem; font-family: var(--font-body); font-size: .74rem; color: #94a3b8; }
+.sc-time small::before { content: "hasta "; }
+.sc-title { margin: 0; font-family: var(--font-body); font-size: 1rem; font-weight: 700; color: #f1f5f9; overflow-wrap: anywhere; }
+.sc-sub { margin: .3rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .7rem; color: #94a3b8; font-family: var(--font-body); font-size: .8rem; }
+.sc-tag { display: inline-flex; align-items: center; gap: .4rem; font-weight: 600; color: #cbd5e1; }
+.sc-tag::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: #64748b; }
+.sc-tag--mlbb::before { background: #b48aff; }
+.sc-tag--ff::before { background: #ef54a6; }
+.sc-tag--event::before { background: #fbbf24; }
+.sc-chip { padding: .22rem .65rem; border-radius: 999px; background: #ffffff14; color: #cbd5e1; font-family: var(--font-body); font-size: .72rem; font-weight: 600; white-space: nowrap; }
+.sc-chip--next { background: color-mix(in srgb, var(--a1) 35%, transparent); color: #fff; }
+.sc-item--next .sc-time { color: var(--a2); }
+.sc-item--done { opacity: .55; }
+.sc-item--event .sc-title { color: #fde68a; }
+@media (max-width: 560px) { .sc-item { grid-template-columns: 4.2rem 1fr; } .sc-chip { grid-column: 2; justify-self: start; } .sc-time { font-size: 1.2rem; } }

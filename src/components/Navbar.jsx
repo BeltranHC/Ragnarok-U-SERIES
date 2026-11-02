@@ -8,6 +8,7 @@ const links = [
   { label: 'Reglamento', to: '#reglamento' },
   { label: 'Equipos confirmados', to: '/equipos' },
   { label: 'Llaves del torneo', to: '/llaves' },
+  { label: 'Cronograma', to: '/cronograma' },
 ]
 
 function Navbar() {

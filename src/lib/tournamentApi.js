@@ -125,6 +125,19 @@ export async function fetchPublicTeams() {
   return t.data.map((team) => ({ ...team, players: players.get(team.id) ?? [] }))
 }
 
+// Partidos con hora, fases publicadas y eventos libres del cronograma. Si la tabla de eventos aún no existe
+// (falta actualizar el SQL), el cronograma muestra solo los partidos.
+export async function fetchSchedule() {
+  if (!isSupabaseConfigured) return { matches: [], stages: [], events: [] }
+  const [m, s, e] = await Promise.all([
+    supabase.from('public_matches').select('id, stage_id, round, team_a, team_b, team_a_name, team_b_name, best_of, status, scheduled_at').not('scheduled_at', 'is', null),
+    supabase.from('public_stages').select('id, game_key, name, type'),
+    supabase.from('schedule_events').select('*').order('starts_at'),
+  ])
+  if (m.error || s.error) throw new Error((m.error || s.error).message)
+  return { matches: m.data, stages: s.data, events: e.error ? [] : e.data }
+}
+
 export async function fetchPublishedStages() {
   if (!isSupabaseConfigured) return { stages: [], groups: [], groupTeams: [], matches: [], results: [] }
   const [s, g, gt, m, r] = await Promise.all([

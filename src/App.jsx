@@ -15,6 +15,7 @@ import Inscription from './pages/Inscription'
 import PagePlaceholder from './pages/PagePlaceholder'
 import Teams from './pages/Teams'
 import Bracket from './pages/Bracket'
+import Schedule from './pages/Schedule'
 import { TournamentProvider, useTournament } from './context/TournamentContext'
 import { publicUrl } from './lib/tournamentApi'
 import './App.css'
@@ -25,6 +26,7 @@ import './styles/hero-carousel.css'
 import './styles/public-data.css'
 import './styles/success.css'
 import './styles/teams.css'
+import './styles/schedule.css'
 
 function AppContent() {
   const [showSplash, setShowSplash] = useState(true)
@@ -81,6 +83,7 @@ function AppContent() {
           <Route path="/inscripcion" element={<Inscription />} />
           <Route path="/equipos" element={<Teams />} />
           <Route path="/llaves" element={<Bracket />} />
+          <Route path="/cronograma" element={<Schedule />} />
           <Route path="*" element={<PagePlaceholder title="Página no encontrada" description="La ruta que buscas no existe en U-Series." kind="not-found" />} />
         </Routes>
         <Footer />
