@@ -109,11 +109,31 @@ export async function fetchAvailability() {
   return Object.fromEntries(data.map((row) => [row.game_key, { max: row.max_teams, taken: row.taken }]))
 }
 
+// Equipos aprobados con sus integrantes (solo apodos) y, en Free Fire, su sala y número fijo.
+// Si aún no se actualizó el SQL (vista de integrantes) o no hay fase publicada, esos datos quedan vacíos.
 export async function fetchPublicTeams() {
   if (!isSupabaseConfigured) return []
-  const { data, error } = await supabase.from('public_teams').select('*').order('team_name')
-  if (error) throw new Error(error.message)
-  return data
+  const [t, p, s] = await Promise.all([
+    supabase.from('public_teams').select('*').order('team_name'),
+    supabase.from('public_team_players').select('*').order('slot'),
+    supabase.from('public_stages').select('id, game_key, type, position, config').order('position'),
+  ])
+  if (t.error) throw new Error(t.error.message)
+  const players = new Map()
+  ;(p.error ? [] : p.data).forEach((row) => players.set(row.registration_id, [...(players.get(row.registration_id) ?? []), row]))
+  // Última fase Battle Royale publicada de cada juego: de ahí sale la sala de cada equipo.
+  const stageOf = {}
+  ;(s.error ? [] : s.data).filter((x) => x.type === 'battle_royale').forEach((x) => { stageOf[x.game_key] = x })
+  return t.data.map((team) => {
+    const config = stageOf[team.game_key]?.config
+    const rooms = Number(config?.rooms) || 1
+    return {
+      ...team,
+      players: players.get(team.id) ?? [],
+      room: rooms > 1 ? Math.min(config?.room_of?.[team.id] ?? 1, rooms) : null,
+      slot: config?.slot_of?.[team.id] ?? null,
+    }
+  })
 }
 
 export async function fetchPublishedStages() {

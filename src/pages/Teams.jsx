@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRegistration } from '../context/RegistrationContext'
 import { fetchPublicTeams, publicUrl } from '../lib/tournamentApi'
 import PagePlaceholder from './PagePlaceholder'
+import TeamCard from '../components/TeamCard'
 
 const description = 'Las escuadras que representarán a su universidad en RAGNAROK U-Series.'
 
@@ -35,16 +36,7 @@ function Teams() {
         <p className="pd-empty">Aún no hay equipos confirmados en esta disciplina.</p>
       ) : (
         <ul className="pd-team-grid">
-          {visible.map((team, index) => {
-            const logo = publicUrl('team-logos', team.logo_path)
-            return (
-              <li className="pd-team-card" key={team.id}>
-                <span className="pd-team-index">{String(index + 1).padStart(2, '0')}</span>
-                {logo ? <img src={logo} alt="" loading="lazy" className="pd-team-logo" /> : <span className="pd-team-logo pd-team-logo--empty" aria-hidden="true">{team.team_name[0]}</span>}
-                <div><strong>{team.team_name}</strong><small>{team.institution}</small></div>
-              </li>
-            )
-          })}
+          {visible.map((team, index) => <TeamCard key={team.id} team={team} index={index} logo={publicUrl('team-logos', team.logo_path)} />)}
         </ul>
       )}
     </main>

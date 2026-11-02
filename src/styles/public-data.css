@@ -1,10 +1,18 @@
 /* Equipos confirmados y llaves publicadas (datos desde Supabase) */
 .pd-empty { text-align: center; color: #94a3b8; padding: 2.5rem 1rem; font-family: var(--font-body); }
-.pd-team-grid { list-style: none; margin: 1.6rem auto 0; padding: 0; max-width: 1240px; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-.pd-team-card { position: relative; display: flex; align-items: center; gap: .9rem; padding: 1rem 1.1rem; background: var(--panel); border: 1px solid rgba(255,255,255,.09); border-left: 3px solid var(--a1); border-radius: 10px; }
-.pd-team-card strong { display: block; font-family: var(--font-display); letter-spacing: .04em; }
-.pd-team-card small { color: #94a3b8; font-family: var(--font-body); }
+.pd-team-grid { list-style: none; margin: 1.6rem auto 0; padding: 0; max-width: 1240px; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; }
+.pd-team-card { position: relative; display: grid; gap: .8rem; padding: 1rem 1.1rem; background: var(--panel); border: 1px solid rgba(255,255,255,.09); border-left: 3px solid var(--a1); border-radius: 10px; }
+.pd-team-top { display: flex; align-items: center; gap: .9rem; padding-right: 1.6rem; }
+.pd-team-top strong { display: block; font-family: var(--font-display); letter-spacing: .04em; }
+.pd-team-top small { display: block; color: #94a3b8; font-family: var(--font-body); line-height: 1.35; }
 .pd-team-index { position: absolute; top: .4rem; right: .7rem; color: rgba(255,255,255,.18); font-family: var(--font-display); font-size: .8rem; }
+.pd-team-room { margin: 0; display: flex; gap: .4rem; flex-wrap: wrap; }
+.pd-chip { font-family: var(--font-display); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; padding: .2rem .55rem; border-radius: 6px; background: rgba(255,255,255,.08); color: #cbd5e1; }
+.pd-chip--room { background: color-mix(in srgb, var(--a1) 28%, transparent); color: #fff; }
+.pd-members { list-style: none; margin: 0; padding: .7rem 0 0; border-top: 1px solid rgba(255,255,255,.08); display: flex; flex-wrap: wrap; gap: .4rem; }
+.pd-members li { display: inline-flex; align-items: center; gap: .35rem; padding: .25rem .6rem; border-radius: 999px; background: rgba(255,255,255,.06); font-family: var(--font-body); font-size: .8rem; }
+.pd-members em { font-style: normal; font-family: var(--font-display); font-size: .6rem; letter-spacing: .1em; color: var(--a1); }
+.pd-members .pd-sub { color: #94a3b8; }
 .pd-team-logo { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex: none; }
 .pd-team-logo--empty { display: grid; place-items: center; background: rgba(255,255,255,.07); font-family: var(--font-display); font-size: 1.3rem; }
 
