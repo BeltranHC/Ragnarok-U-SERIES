@@ -130,7 +130,7 @@ function Inscription({ modal = false }) {
 
   // Datos Etapa 2 (Roster)
   const [players, setPlayers] = useState(() =>
-    Array.from({ length: MAX_SLOTS }, () => ({ nickname: '', id: '', server: '' }))
+    Array.from({ length: MAX_SLOTS }, () => ({ nickname: '', id: '' }))
   )
 
   // Datos Etapa 3
@@ -260,11 +260,6 @@ function Inscription({ modal = false }) {
         audio.click()
         return false
       }
-      if (game === 'mlbb' && !p.server?.trim()) {
-        setStepError(`Ingresa el Server ID (4 dígitos entre paréntesis) del ${requiredSlots[i].label}.`)
-        audio.click()
-        return false
-      }
     }
     setStepError(null)
     return true
@@ -328,7 +323,6 @@ function Inscription({ modal = false }) {
         players: playerSlots.map((_, i) => ({
           nickname: players[i]?.nickname?.trim() || '',
           game_player_id: players[i]?.id || '',
-          server_id: game === 'mlbb' ? players[i]?.server || '' : '',
         })),
         receipt: paymentReceipt,
         logo: teamLogo,
@@ -531,21 +525,19 @@ function Inscription({ modal = false }) {
               <h3>ROSTER OFICIAL — {gameInfo.name.toUpperCase()}</h3>
               <p>
                 {`Registra a tus ${gameInfo.slots.filter((x) => x.required).length} titulares obligatorios${gameInfo.slots.length > gameInfo.slots.filter((x) => x.required).length ? ' y a tus suplentes opcionales' : ''}.`}
-                {game === 'mlbb' ? ' Es obligatorio el Server ID (los 4 dígitos).' : ''}
               </p>
             </div>
 
             <div className="roster-list">
-              <div className={`roster-table-head ${game === 'mlbb' ? 'roster-table-head--mlbb' : ''}`}>
+              <div className="roster-table-head">
                 <span>ROL</span>
                 <span>NICKNAME EN JUEGO</span>
                 <span>ID DE JUGADOR</span>
-                {game === 'mlbb' && <span>SERVER ID</span>}
               </div>
 
               {playerSlots.map((slot, index) => (
                 <div
-                  className={`roster-row-compact ${slot.required ? '' : 'roster-row-compact--opt'} ${game === 'mlbb' ? 'roster-row-compact--mlbb' : ''}`}
+                  className={`roster-row-compact ${slot.required ? '' : 'roster-row-compact--opt'}`}
                   key={`${game}-${slot.label}`}
                 >
                   <div className="roster-slot-chip">
@@ -573,18 +565,6 @@ function Inscription({ modal = false }) {
                     onChange={(e) => updatePlayer(index, 'id', e.target.value.replace(/\D/g, ''))}
                     required={slot.required}
                   />
-                  {game === 'mlbb' && (
-                    <input
-                      className="compact-input compact-input--mono"
-                      inputMode="numeric"
-                      maxLength={6}
-                      name={`player-${index}-server`}
-                      placeholder={`Server ID ${slot.required ? '*' : '(opcional)'}`}
-                      value={players[index]?.server || ''}
-                      onChange={(e) => updatePlayer(index, 'server', e.target.value.replace(/\D/g, ''))}
-                      required={slot.required}
-                    />
-                  )}
                 </div>
               ))}
             </div>

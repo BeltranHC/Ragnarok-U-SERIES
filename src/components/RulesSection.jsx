@@ -28,10 +28,10 @@ const RULES_DATA = {
       {
         num: '02',
         title: 'Inscripciones y Requisitos de Escuadra',
-        highlight: '5 titulares obligatorios + hasta 2 suplentes · ID Cuenta + Server ID',
+        highlight: '5 titulares obligatorios + hasta 2 suplentes · ID de jugador',
         points: [
           'Estructura del Equipo: Cada escuadra debe registrar obligatoriamente a 5 jugadores titulares. Opcionalmente, se permite el registro de hasta 2 jugadores suplentes.',
-          'Identificación (IDs): Es obligatorio registrar tanto el ID de Cuenta como el ID de Servidor (los 4 dígitos entre paréntesis) de todos los integrantes.',
+          'Identificación (IDs): Es obligatorio registrar el ID de jugador de todos los integrantes.',
           'El Capitán: Será el único medio de comunicación oficial. Debe proveer su nombre real, número de WhatsApp y su institución (UNAP u otra).',
           'Validación de Pagos (Yape): La inscripción será válida tras verificar el comprobante de pago. En caso de ganar, el pozo de premios será transferido única y exclusivamente a la cuenta del capitán.',
         ],
