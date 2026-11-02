@@ -23,6 +23,7 @@ import './styles/entry.css'
 import './styles/content.css'
 import './styles/hero-carousel.css'
 import './styles/public-data.css'
+import './styles/success.css'
 
 function AppContent() {
   const [showSplash, setShowSplash] = useState(true)

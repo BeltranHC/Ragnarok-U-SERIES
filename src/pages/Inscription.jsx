@@ -7,6 +7,8 @@ import { useTournament } from '../context/TournamentContext'
 import { formatSoles } from '../lib/money'
 import { publicUrl, submitRegistration, validateUpload } from '../lib/tournamentApi'
 import SearchSelect from '../components/SearchSelect'
+import RegistrationSuccess from '../components/RegistrationSuccess'
+import { communityLink } from '../lib/whatsapp'
 import { institutionGroups, OTHER_INSTITUTION } from '../lib/institutions'
 import { careerGroups, OTHER_CAREER } from '../lib/careers'
 
@@ -112,7 +114,7 @@ const STEPS = [
 ]
 
 function Inscription({ modal = false }) {
-  const { registrationGame, setActiveGame } = useRegistration()
+  const { registrationGame, setActiveGame, closeRegistration } = useRegistration()
   const { games: gameConfig, settings, deadline, availability } = useTournament()
   const [openedAt] = useState(() => Date.now())
   const [step, setStep] = useState(1)
@@ -368,7 +370,7 @@ function Inscription({ modal = false }) {
       </div>
 
       {/* Stepper visual en 3 niveles */}
-      <div className="wizard-stepper">
+      <div className={`wizard-stepper ${submitted ? 'wizard-stepper--hidden' : ''}`}>
         {STEPS.map((s, idx) => {
           const isActive = step === s.num
           const isDone = step > s.num
@@ -387,6 +389,10 @@ function Inscription({ modal = false }) {
         })}
       </div>
 
+      {submitted ? (
+        <RegistrationSuccess teamName={teamName.trim()} gameName={gameInfo.name} amount={gameInfo.priceFormatted}
+          whatsappGroup={communityLink(settings)} onClose={modal ? closeRegistration : null} />
+      ) : (
       <form className="registration-form" onSubmit={handleSubmit} autoComplete="off">
         <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}>
           <label>No llenar este campo<input tabIndex={-1} autoComplete="off" name="website" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} /></label>
@@ -705,6 +711,7 @@ function Inscription({ modal = false }) {
           )}
         </div>
       </form>
+      )}
     </main>
   )
 }

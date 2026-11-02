@@ -2,22 +2,12 @@ import { Link } from 'react-router-dom'
 import { audio } from '../lib/audioEngine'
 import { useTournament } from '../context/TournamentContext'
 import { formatSoles } from '../lib/money'
+import { communityLink } from '../lib/whatsapp'
 
-const envGroup = import.meta.env.VITE_WHATSAPP_GROUP_URL?.trim() || ''
-
-// Solo se aceptan enlaces https de chat.whatsapp.com.
-function resolveGroup(raw) {
-  try {
-    const url = new URL(raw)
-    return url.protocol === 'https:' && url.hostname === 'chat.whatsapp.com' && url.pathname.length > 1 ? url.href : ''
-  } catch {
-    return ''
-  }
-}
 
 function Footer() {
   const { games, deadline, settings } = useTournament()
-  const whatsappGroup = resolveGroup(settings.whatsapp_group_url || envGroup)
+  const whatsappGroup = communityLink(settings)
   // Crédito obligatorio (CC BY 4.0) mientras se usen las pistas por defecto; con música propia no aplica.
   const credits = [
     !games.mlbb.music_path && '“Heroic Age” (Mobile Legends)',
