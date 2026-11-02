@@ -118,6 +118,8 @@ export async function fetchPublicTeams() {
     supabase.from('public_team_players').select('*').order('slot'),
   ])
   if (t.error) throw new Error(t.error.message)
+  // Sin la vista de integrantes (falta ejecutar 01_schema.sql en Supabase) no hay apodos que mostrar.
+  if (p.error) console.warn('No se pudieron cargar los integrantes: ejecuta 01_schema.sql actualizado en Supabase.', p.error.message)
   const players = new Map()
   ;(p.error ? [] : p.data).forEach((row) => players.set(row.registration_id, [...(players.get(row.registration_id) ?? []), row]))
   return t.data.map((team) => ({ ...team, players: players.get(team.id) ?? [] }))
