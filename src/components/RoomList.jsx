@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { initialOf } from '../lib/text'
 
 // Llaves del torneo (Free Fire): cada sala con sus equipos y el LUGAR EN LA SALA de cada uno.
 // Se toca un equipo para ver sus integrantes, su institución y su carrera.
@@ -34,15 +35,18 @@ export default function RoomList({ teams, logoOf }) {
                     <div className="pd-room-detail">
                       {team.professional_school && <p className="pd-room-career">{team.professional_school}</p>}
                       {team.players.length > 0 ? (
-                        <ul className="pd-members" aria-label={`Integrantes de ${team.team_name}`}>
-                          {team.players.map((player) => (
-                            <li key={player.slot}>
-                              <span>{player.nickname}</span>
-                              {player.slot === 1 && <em title="Capitán">CAP</em>}
-                              {player.is_substitute && <em className="pd-sub" title="Suplente">SUP</em>}
-                            </li>
-                          ))}
-                        </ul>
+                        <section className="tm-roster" aria-label={`Integrantes de ${team.team_name}`}>
+                          <ul>
+                            {team.players.map((player) => (
+                              <li key={player.slot} className={player.slot === 1 ? 'tm-player tm-player--cap' : 'tm-player'}>
+                                <span className="tm-avatar" aria-hidden="true">{initialOf(player.nickname)}</span>
+                                <span className="tm-nick" title={player.nickname}>{player.nickname}</span>
+                                {player.slot === 1 && <em className="tm-tag tm-tag--cap" title="Capitán">CAP</em>}
+                                {player.is_substitute && <em className="tm-tag" title="Suplente">SUP</em>}
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
                       ) : <p className="pd-room-career">Integrantes no disponibles.</p>}
                     </div>
                   )}
