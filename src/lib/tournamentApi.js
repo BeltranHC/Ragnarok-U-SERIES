@@ -11,8 +11,8 @@ export const FALLBACK_CONFIG = {
     contact_whatsapp: '',
   },
   games: {
-    mlbb: { key: 'mlbb', price: 20, max_teams: 32, starters: 5, substitutes: 2, is_open: true, rules_pdf_path: null },
-    ff: { key: 'ff', price: 15, max_teams: 24, starters: 4, substitutes: 1, is_open: true, rules_pdf_path: null },
+    mlbb: { key: 'mlbb', price: 20, max_teams: 32, starters: 5, substitutes: 2, is_open: true, rules_pdf_path: null, live: false, live_links: [] },
+    ff: { key: 'ff', price: 15, max_teams: 24, starters: 4, substitutes: 1, is_open: true, rules_pdf_path: null, live: false, live_links: [] },
   },
   prizes: [
     { place: 1, label: 'CAMPEÓN', amount: 1500, description: 'Trofeo y reconocimiento oficial' },

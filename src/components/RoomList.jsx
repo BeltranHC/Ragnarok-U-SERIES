@@ -1,5 +1,9 @@
-// Free Fire: cada sala con sus equipos y el número fijo (N.º) que cada equipo tiene en ella.
+import { useState } from 'react'
+
+// Free Fire: cada sala con sus equipos y el LUGAR que cada equipo tiene en ella.
+// Se toca un equipo para ver sus integrantes, su institución y su carrera.
 export default function RoomList({ teams, logoOf }) {
+  const [openId, setOpenId] = useState(null)
   const rooms = new Map()
   teams.forEach((team) => {
     const room = team.room ?? 1
@@ -12,14 +16,35 @@ export default function RoomList({ teams, logoOf }) {
       {ordered.map(([room, list]) => (
         <section className="pd-room-card" key={room}>
           <header><h3>Sala {room}</h3><span>{list.length} {list.length === 1 ? 'equipo' : 'equipos'}</span></header>
+          <p className="pd-room-help">El número es el <b>lugar del equipo en la sala</b>. Toca un equipo para ver sus integrantes.</p>
           <ol>
             {[...list].sort((a, b) => (a.slot ?? 99) - (b.slot ?? 99) || a.team_name.localeCompare(b.team_name)).map((team) => {
               const logo = logoOf(team)
+              const open = openId === team.id
               return (
-                <li key={team.id}>
-                  <b className="pd-room-num" title="Número del equipo en la sala">{team.slot ?? '·'}</b>
-                  {logo ? <img src={logo} alt="" loading="lazy" className="pd-room-logo" /> : <span className="pd-room-logo pd-room-logo--empty" aria-hidden="true">{team.team_name[0]}</span>}
-                  <span className="pd-room-name"><strong>{team.team_name}</strong>{team.institution && <small>{team.institution}</small>}</span>
+                <li key={team.id} className={open ? 'pd-room-item pd-room-item--open' : 'pd-room-item'}>
+                  <button type="button" className="pd-room-row" aria-expanded={open} onClick={() => setOpenId(open ? null : team.id)}>
+                    <b className="pd-room-num" title="Lugar del equipo en la sala">{team.slot ?? '·'}</b>
+                    {logo ? <img src={logo} alt="" loading="lazy" className="pd-room-logo" /> : <span className="pd-room-logo pd-room-logo--empty" aria-hidden="true">{team.team_name[0]}</span>}
+                    <span className="pd-room-name"><strong>{team.team_name}</strong>{team.institution && <small>{team.institution}</small>}</span>
+                    <span className="pd-room-caret" aria-hidden="true">{open ? '▾' : '▸'}</span>
+                  </button>
+                  {open && (
+                    <div className="pd-room-detail">
+                      {team.professional_school && <p className="pd-room-career">{team.professional_school}</p>}
+                      {team.players.length > 0 ? (
+                        <ul className="pd-members" aria-label={`Integrantes de ${team.team_name}`}>
+                          {team.players.map((player) => (
+                            <li key={player.slot}>
+                              <span>{player.nickname}</span>
+                              {player.slot === 1 && <em title="Capitán">CAP</em>}
+                              {player.is_substitute && <em className="pd-sub" title="Suplente">SUP</em>}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : <p className="pd-room-career">Integrantes no disponibles.</p>}
+                    </div>
+                  )}
                 </li>
               )
             })}

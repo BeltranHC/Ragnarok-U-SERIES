@@ -174,7 +174,7 @@ function StageView({ stage, data }) {
             {qualify > 0 && <p className="pd-qualify-note">{rooms > 1 ? `Pasan los ${qualify} primeros de la sala` : `Pasan los ${qualify} primeros a la siguiente fase`}</p>}
             {rows.length === 0 ? <p className="pd-empty">Aún no hay partidas jugadas.</p> : (
               <table className="pd-table">
-                <thead><tr><th title="Posición">Pos.</th>{Object.keys(slotOf).length > 0 && <th title="Número del equipo en la sala">N.º</th>}<th>Equipo</th><th>PJ</th><th>Kills</th><th>Pts</th></tr></thead>
+                <thead><tr><th title="Posición">Pos.</th>{Object.keys(slotOf).length > 0 && <th title="Lugar del equipo en la sala">Lugar</th>}<th>Equipo</th><th>PJ</th><th>Kills</th><th>Pts</th></tr></thead>
                 <tbody>{rows.map((r, i) => <tr key={r.id} className={r.id === champion ? 'pd-row--champion' : qualify && i < qualify ? 'pd-row--qualify' : undefined}><td>{i + 1}</td>{Object.keys(slotOf).length > 0 && <td><b>{slotOf[r.id] ?? '·'}</b></td>}<td>{r.name}</td><td>{r.played}</td><td>{r.kills}</td><td><b>{r.points}</b></td></tr>)}</tbody>
               </table>
             )}

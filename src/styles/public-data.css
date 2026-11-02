@@ -86,9 +86,32 @@
 .pd-room-card h3 { margin: 0; font-family: var(--font-display); letter-spacing: .08em; text-transform: uppercase; }
 .pd-room-card header span { color: #94a3b8; font-family: var(--font-body); font-size: .8rem; }
 .pd-room-card ol { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
-.pd-room-card li { display: grid; grid-template-columns: 2.4rem 2.2rem 1fr; align-items: center; gap: .6rem; padding: .35rem .5rem; border-radius: 8px; background: rgba(255,255,255,.04); }
+.pd-room-help { margin: -.3rem 0 .8rem; color: #94a3b8; font-family: var(--font-body); font-size: .78rem; }
+.pd-room-help b { color: #e2e8f0; font-weight: 600; }
+.pd-room-item { border-radius: 8px; background: rgba(255,255,255,.04); overflow: hidden; border: 1px solid transparent; }
+.pd-room-item--open { border-color: color-mix(in srgb, var(--a1) 55%, transparent); background: rgba(255,255,255,.06); }
+.pd-room-row { width: 100%; display: grid; grid-template-columns: 2.4rem 2.2rem 1fr auto; align-items: center; gap: .6rem; padding: .35rem .5rem; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; font: inherit; }
+.pd-room-row:hover { background: rgba(255,255,255,.05); }
+.pd-room-caret { color: #94a3b8; font-size: .8rem; padding-right: .2rem; }
+.pd-room-detail { padding: .2rem .7rem .8rem; display: grid; gap: .6rem; }
+.pd-room-career { margin: 0; color: #cbd5e1; font-family: var(--font-body); font-size: .8rem; }
+.pd-room-detail .pd-members { border-top: 0; padding-top: 0; }
 .pd-room-num { display: grid; place-items: center; height: 2rem; border-radius: 8px; background: color-mix(in srgb, var(--a1) 30%, transparent); font-family: var(--font-display); font-size: 1rem; font-variant-numeric: tabular-nums; }
 .pd-room-logo { width: 2.2rem; height: 2.2rem; border-radius: 7px; object-fit: cover; }
 .pd-room-logo--empty { display: grid; place-items: center; background: rgba(255,255,255,.07); font-family: var(--font-display); }
 .pd-room-name strong { display: block; font-family: var(--font-body); font-size: .92rem; }
 .pd-room-name small { display: block; color: #94a3b8; font-family: var(--font-body); font-size: .74rem; }
+
+/* EN VIVO: aviso fijo con los enlaces de transmisión de cada juego */
+.lv-dock { position: fixed; z-index: 70; left: 1.1rem; bottom: 1.1rem; display: grid; gap: .6rem; max-width: min(340px, calc(100vw - 2.2rem)); }
+.lv-card { padding: .7rem .9rem; border: 1px solid #ffffff26; border-left: 4px solid #ef4444; border-radius: 8px; background: #0b0f17f2; backdrop-filter: blur(12px); box-shadow: 0 10px 30px #0006; }
+.lv-card--mlbb { border-left-color: #b48aff; }
+.lv-card--ff { border-left-color: #ef54a6; }
+.lv-title { margin: 0 0 .5rem; display: flex; align-items: center; gap: .5rem; font-family: var(--font-display); font-size: .74rem; letter-spacing: .14em; color: #fecaca; }
+.lv-title b { color: #fff; letter-spacing: .06em; }
+.lv-dot { width: .6rem; height: .6rem; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 0 #ef4444aa; animation: lv-pulse 1.4s ease-out infinite; flex: none; }
+@keyframes lv-pulse { 0% { box-shadow: 0 0 0 0 #ef4444aa; } 100% { box-shadow: 0 0 0 .6rem #ef444400; } }
+.lv-links { display: flex; flex-wrap: wrap; gap: .4rem; }
+.lv-links a { padding: .35rem .75rem; border-radius: 6px; background: #ffffff14; color: #fff; text-decoration: none; font-family: var(--font-body); font-size: .8rem; font-weight: 700; }
+.lv-links a:hover { background: #ef4444; }
+@media (max-width: 600px) { .lv-dock { left: .6rem; bottom: 4.6rem; } }

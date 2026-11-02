@@ -7,6 +7,7 @@ import ParticleBackground from './components/ParticleBackground'
 import RegistrationModal from './components/RegistrationModal'
 import SplashScreen from './components/SplashScreen'
 import Footer from './components/Footer'
+import LiveDock from './components/LiveDock'
 import { RegistrationProvider, useRegistration } from './context/RegistrationContext'
 import { audio } from './lib/audioEngine'
 import Home from './pages/Home'
@@ -82,6 +83,7 @@ function AppContent() {
         </Routes>
         <Footer />
         {audioStarted && <AudioControls />}
+        {!showSplash && <LiveDock />}
         <RegistrationModal onClose={closeRegistration} open={isRegistrationOpen}>
           <Inscription modal />
         </RegistrationModal>

@@ -14,7 +14,7 @@ export default function TeamCard({ team, index, logo }) {
       {(team.room || team.slot) && (
         <p className="pd-team-room">
           {team.room && <span className="pd-chip pd-chip--room">Sala {team.room}</span>}
-          {team.slot && <span className="pd-chip">N.º {team.slot}</span>}
+          {team.slot && <span className="pd-chip" title="Lugar del equipo en la sala">Lugar {team.slot}</span>}
         </p>
       )}
       {team.players.length > 0 && (
