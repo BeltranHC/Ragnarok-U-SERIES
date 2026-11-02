@@ -161,6 +161,7 @@ function StageView({ stage, data }) {
   const rooms = Number(stage.config?.rooms) || 1
   const roomOf = (id) => (rooms > 1 ? Math.min(stage.config?.room_of?.[id] ?? 1, rooms) : 1)
   const champion = stage.config?.champion
+  const slotOf = stage.config?.slot_of ?? {} // número fijo de cada equipo en su sala
   const championName = champion ? totals.get(champion)?.name : null
   return (
     <section className="pd-card">
@@ -173,8 +174,8 @@ function StageView({ stage, data }) {
             {qualify > 0 && <p className="pd-qualify-note">{rooms > 1 ? `Pasan los ${qualify} primeros de la sala` : `Pasan los ${qualify} primeros a la siguiente fase`}</p>}
             {rows.length === 0 ? <p className="pd-empty">Aún no hay partidas jugadas.</p> : (
               <table className="pd-table">
-                <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Kills</th><th>Pts</th></tr></thead>
-                <tbody>{rows.map((r, i) => <tr key={r.id} className={r.id === champion ? 'pd-row--champion' : qualify && i < qualify ? 'pd-row--qualify' : undefined}><td>{i + 1}</td><td>{r.name}</td><td>{r.played}</td><td>{r.kills}</td><td><b>{r.points}</b></td></tr>)}</tbody>
+                <thead><tr><th title="Posición">Pos.</th>{Object.keys(slotOf).length > 0 && <th title="Número del equipo en la sala">N.º</th>}<th>Equipo</th><th>PJ</th><th>Kills</th><th>Pts</th></tr></thead>
+                <tbody>{rows.map((r, i) => <tr key={r.id} className={r.id === champion ? 'pd-row--champion' : qualify && i < qualify ? 'pd-row--qualify' : undefined}><td>{i + 1}</td>{Object.keys(slotOf).length > 0 && <td><b>{slotOf[r.id] ?? '·'}</b></td>}<td>{r.name}</td><td>{r.played}</td><td>{r.kills}</td><td><b>{r.points}</b></td></tr>)}</tbody>
               </table>
             )}
           </div>

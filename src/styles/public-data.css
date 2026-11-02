@@ -77,3 +77,18 @@
 .pd-row--champion td:first-child { box-shadow: inset 3px 0 0 #fbbf24; font-weight: 800; }
 
 .pd-room-table + .pd-room-table { margin-top: 1.2rem; }
+
+/* Free Fire: equipos por sala con su número */
+.pd-view-toggle { margin-top: 1rem; }
+.pd-room-lists { list-style: none; margin: 1.6rem auto 0; padding: 0; max-width: 1240px; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start; }
+.pd-room-card { background: var(--panel); border: 1px solid rgba(255,255,255,.09); border-top: 3px solid var(--a1); border-radius: 10px; padding: 1rem 1.1rem; }
+.pd-room-card header { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; margin-bottom: .8rem; }
+.pd-room-card h3 { margin: 0; font-family: var(--font-display); letter-spacing: .08em; text-transform: uppercase; }
+.pd-room-card header span { color: #94a3b8; font-family: var(--font-body); font-size: .8rem; }
+.pd-room-card ol { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+.pd-room-card li { display: grid; grid-template-columns: 2.4rem 2.2rem 1fr; align-items: center; gap: .6rem; padding: .35rem .5rem; border-radius: 8px; background: rgba(255,255,255,.04); }
+.pd-room-num { display: grid; place-items: center; height: 2rem; border-radius: 8px; background: color-mix(in srgb, var(--a1) 30%, transparent); font-family: var(--font-display); font-size: 1rem; font-variant-numeric: tabular-nums; }
+.pd-room-logo { width: 2.2rem; height: 2.2rem; border-radius: 7px; object-fit: cover; }
+.pd-room-logo--empty { display: grid; place-items: center; background: rgba(255,255,255,.07); font-family: var(--font-display); }
+.pd-room-name strong { display: block; font-family: var(--font-body); font-size: .92rem; }
+.pd-room-name small { display: block; color: #94a3b8; font-family: var(--font-body); font-size: .74rem; }
