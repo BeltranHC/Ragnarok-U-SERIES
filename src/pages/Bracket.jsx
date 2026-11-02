@@ -158,41 +158,28 @@ function StageView({ stage, data }) {
   })
   const ranking = [...totals.values()].sort((a, b) => b.points - a.points || b.kills - a.kills)
   const qualify = Number(stage.config?.qualify_count) || 0
-  const roomMatches = matches.filter((m) => m.rooms > 1).sort((a, b) => a.round - b.round)
+  const rooms = Number(stage.config?.rooms) || 1
+  const roomOf = (id) => (rooms > 1 ? Math.min(stage.config?.room_of?.[id] ?? 1, rooms) : 1)
   const champion = stage.config?.champion
   const championName = champion ? totals.get(champion)?.name : null
   return (
     <section className="pd-card">
       {championName && <p className="pd-champion"><span>Campeón</span><b>{championName}</b></p>}
-      {roomMatches.length > 0 && (
-        <div className="pd-rooms">
-          <h3>Salas por partida</h3>
-          {roomMatches.map((m) => {
-            const rows = data.lobbyRooms.filter((x) => x.match_id === m.id)
-            return (
-              <details className="pd-room-match" key={m.id}>
-                <summary>Partida {m.round} · {m.rooms} salas</summary>
-                <div className="pd-room-grid">
-                  {Array.from({ length: m.rooms }, (_, i) => i + 1).map((room) => (
-                    <div className="pd-room" key={room}>
-                      <b>Sala {room}</b>
-                      <ul>{rows.filter((x) => x.room === room).map((x) => <li key={x.registration_id}>{x.team_name}</li>)}</ul>
-                    </div>
-                  ))}
-                </div>
-              </details>
-            )
-          })}
-        </div>
-      )}
-      <h3>Tabla general</h3>
-      {qualify > 0 && <p className="pd-qualify-note">Pasan los {qualify} primeros a la siguiente fase</p>}
-      {ranking.length === 0 ? <p className="pd-empty">Aún no hay partidas jugadas.</p> : (
-        <table className="pd-table">
-          <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Kills</th><th>Pts</th></tr></thead>
-          <tbody>{ranking.map((r, i) => <tr key={r.id} className={r.id === champion ? 'pd-row--champion' : qualify && i < qualify ? 'pd-row--qualify' : undefined}><td>{i + 1}</td><td>{r.name}</td><td>{r.played}</td><td>{r.kills}</td><td><b>{r.points}</b></td></tr>)}</tbody>
-        </table>
-      )}
+      {Array.from({ length: rooms }, (_, i) => i + 1).map((room) => {
+        const rows = rooms > 1 ? ranking.filter((r) => roomOf(r.id) === room) : ranking
+        return (
+          <div className="pd-room-table" key={room}>
+            <h3>{rooms > 1 ? `Sala ${room}` : 'Tabla general'}</h3>
+            {qualify > 0 && <p className="pd-qualify-note">{rooms > 1 ? `Pasan los ${qualify} primeros de la sala` : `Pasan los ${qualify} primeros a la siguiente fase`}</p>}
+            {rows.length === 0 ? <p className="pd-empty">Aún no hay partidas jugadas.</p> : (
+              <table className="pd-table">
+                <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Kills</th><th>Pts</th></tr></thead>
+                <tbody>{rows.map((r, i) => <tr key={r.id} className={r.id === champion ? 'pd-row--champion' : qualify && i < qualify ? 'pd-row--qualify' : undefined}><td>{i + 1}</td><td>{r.name}</td><td>{r.played}</td><td>{r.kills}</td><td><b>{r.points}</b></td></tr>)}</tbody>
+              </table>
+            )}
+          </div>
+        )
+      })}
     </section>
   )
 }

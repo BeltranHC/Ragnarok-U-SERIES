@@ -68,10 +68,4 @@
 .pd-row--champion td { background: rgba(251,191,36,.12); }
 .pd-row--champion td:first-child { box-shadow: inset 3px 0 0 #fbbf24; font-weight: 800; }
 
-.pd-rooms { margin-bottom: 1rem; display: grid; gap: .5rem; }
-.pd-rooms h3 { margin: 0; }
-.pd-room-match { border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: .5rem .8rem; background: rgba(255,255,255,.03); }
-.pd-room-match summary { cursor: pointer; font-family: var(--font-body); font-weight: 600; font-size: .9rem; }
-.pd-room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .6rem; margin-top: .6rem; }
-.pd-room b { font-family: var(--font-display); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--a1); }
-.pd-room ul { margin: .3rem 0 0; padding-left: 1.1rem; font-family: var(--font-body); font-size: .85rem; }
+.pd-room-table + .pd-room-table { margin-top: 1.2rem; }

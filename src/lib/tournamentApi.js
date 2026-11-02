@@ -117,18 +117,17 @@ export async function fetchPublicTeams() {
 }
 
 export async function fetchPublishedStages() {
-  if (!isSupabaseConfigured) return { stages: [], groups: [], groupTeams: [], matches: [], results: [], lobbyRooms: [] }
-  const [s, g, gt, m, r, lr] = await Promise.all([
+  if (!isSupabaseConfigured) return { stages: [], groups: [], groupTeams: [], matches: [], results: [] }
+  const [s, g, gt, m, r] = await Promise.all([
     supabase.from('public_stages').select('*').order('position'),
     supabase.from('public_groups').select('*').order('name'),
     supabase.from('public_group_teams').select('*'),
     supabase.from('public_matches').select('*').order('round').order('position'),
     supabase.from('public_match_results').select('*'),
-    supabase.from('public_lobby_rooms').select('*'), // solo existe tras actualizar el SQL; si falta, no hay salas
   ])
   const err = s.error || g.error || gt.error || m.error || r.error
   if (err) throw new Error(err.message)
-  return { stages: s.data, groups: g.data, groupTeams: gt.data, matches: m.data, results: r.data, lobbyRooms: lr.error ? [] : lr.data }
+  return { stages: s.data, groups: g.data, groupTeams: gt.data, matches: m.data, results: r.data }
 }
 
 // Contenido editable (reglamento por juego y pasos). Si la migración aún no existe, devuelve null.
