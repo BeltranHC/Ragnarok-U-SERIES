@@ -32,8 +32,6 @@ function Teams() {
     return <PagePlaceholder title="Equipos confirmados" description={description} kind="teams" />
   }
 
-  const playerCount = inGame.reduce((sum, team) => sum + team.players.length, 0)
-  const institutions = new Set(inGame.map((team) => team.institution).filter(Boolean)).size
   return (
     <main className="competition-page">
       <header className="competition-heading template-section-title">
@@ -47,14 +45,10 @@ function Teams() {
 
       {inGame.length > 0 && (
         <div className="tm-toolbar">
-          <dl className="tm-stats">
-            <div><dt>Equipos</dt><dd>{inGame.length}</dd></div>
-            {playerCount > 0 && <div><dt>Jugadores</dt><dd>{playerCount}</dd></div>}
-            {institutions > 0 && <div><dt>Instituciones</dt><dd>{institutions}</dd></div>}
-          </dl>
+          <p className="tm-count"><b>{visible.length}</b> {visible.length === 1 ? 'equipo' : 'equipos'}</p>
           <label className="tm-search">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-            <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar equipo, jugador o institución…" aria-label="Buscar equipos" />
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar equipo o jugador…" aria-label="Buscar equipos" />
           </label>
         </div>
       )}
@@ -65,7 +59,7 @@ function Teams() {
         <p className="pd-empty">Ningún equipo coincide con «{query}».</p>
       ) : (
         <ul className="tm-grid">
-          {visible.map((team, index) => <TeamCard key={team.id} team={team} index={index} logo={publicUrl('team-logos', team.logo_path)} />)}
+          {visible.map((team) => <TeamCard key={team.id} team={team} logo={publicUrl('team-logos', team.logo_path)} />)}
         </ul>
       )}
     </main>
