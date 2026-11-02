@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRegistration } from '../context/RegistrationContext'
 import { fetchPublicTeams, publicUrl } from '../lib/tournamentApi'
 import PagePlaceholder from './PagePlaceholder'
-import TeamRow from '../components/TeamRow'
+import TeamCard from '../components/TeamCard'
 
 const description = 'Las escuadras que representarán a su universidad en RAGNAROK U-Series.'
 
@@ -58,14 +58,9 @@ function Teams() {
       ) : visible.length === 0 ? (
         <p className="pd-empty">Ningún equipo coincide con «{query}».</p>
       ) : (
-        <div className="tr-table">
-          <div className="tr-head" aria-hidden="true">
-            <span>#</span><span /><span>Equipo</span><span>Institución</span><span>Carrera</span><span>Integrantes</span><span />
-          </div>
-          <ul className="tr-list">
-            {visible.map((team, index) => <TeamRow key={team.id} team={team} index={index} logo={publicUrl('team-logos', team.logo_path)} />)}
-          </ul>
-        </div>
+        <ul className="tc-grid">
+          {visible.map((team) => <TeamCard key={team.id} team={team} logo={publicUrl('team-logos', team.logo_path)} />)}
+        </ul>
       )}
     </main>
   )
