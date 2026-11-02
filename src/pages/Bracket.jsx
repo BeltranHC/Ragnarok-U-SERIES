@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRegistration } from '../context/RegistrationContext'
-import { fetchPublishedStages } from '../lib/tournamentApi'
+import { fetchPublishedStages, fetchPublicTeams, publicUrl } from '../lib/tournamentApi'
+import RoomList from '../components/RoomList'
 import PagePlaceholder from './PagePlaceholder'
 
 const description = 'El camino de cada equipo, desde sus primeros encuentros hasta la definición del torneo.'
@@ -78,7 +79,7 @@ function standings(teamIds, names, matches) {
   return [...rows.values()].sort((x, y) => y.points - x.points || y.diff - x.diff)
 }
 
-function StageView({ stage, data }) {
+function StageView({ stage, data, teams }) {
   const matches = data.matches.filter((m) => m.stage_id === stage.id)
   if (stage.type === 'single_elim') {
     const total = matches.reduce((max, m) => Math.max(max, m.round), 0)
@@ -162,9 +163,19 @@ function StageView({ stage, data }) {
   const roomOf = (id) => (rooms > 1 ? Math.min(stage.config?.room_of?.[id] ?? 1, rooms) : 1)
   const champion = stage.config?.champion
   const slotOf = stage.config?.slot_of ?? {} // número fijo de cada equipo en su sala
+  // Equipos de esta fase con su sala y su lugar en ella (solo si ya se asignaron).
+  const roomTeams = Object.keys(slotOf).length === 0 ? [] : teams
+    .filter((team) => team.game_key === stage.game_key && slotOf[team.id] && (!stage.config?.participants || stage.config.participants.includes(team.id)))
+    .map((team) => ({ ...team, slot: slotOf[team.id], room: rooms > 1 ? Math.min(stage.config?.room_of?.[team.id] ?? 1, rooms) : 1 }))
   const championName = champion ? totals.get(champion)?.name : null
   return (
     <section className="pd-card">
+      {roomTeams.length > 0 && (
+        <div className="pd-rooms-block">
+          <h3>{rooms > 1 ? 'Salas y lugar de cada equipo' : 'Lugar de cada equipo en la sala'}</h3>
+          <RoomList teams={roomTeams} logoOf={(team) => publicUrl('team-logos', team.logo_path)} />
+        </div>
+      )}
       {championName && <p className="pd-champion"><span>Campeón</span><b>{championName}</b></p>}
       {Array.from({ length: rooms }, (_, i) => i + 1).map((room) => {
         const rows = rooms > 1 ? ranking.filter((r) => roomOf(r.id) === room) : ranking
@@ -174,7 +185,7 @@ function StageView({ stage, data }) {
             {qualify > 0 && <p className="pd-qualify-note">{rooms > 1 ? `Pasan los ${qualify} primeros de la sala` : `Pasan los ${qualify} primeros a la siguiente fase`}</p>}
             {rows.length === 0 ? <p className="pd-empty">Aún no hay partidas jugadas.</p> : (
               <table className="pd-table">
-                <thead><tr><th title="Posición">Pos.</th>{Object.keys(slotOf).length > 0 && <th title="Lugar del equipo en la sala">Lugar</th>}<th>Equipo</th><th>PJ</th><th>Kills</th><th>Pts</th></tr></thead>
+                <thead><tr><th title="Posición">Pos.</th>{Object.keys(slotOf).length > 0 && <th title="Lugar del equipo en la sala">Lugar en la sala</th>}<th>Equipo</th><th>PJ</th><th>Kills</th><th>Pts</th></tr></thead>
                 <tbody>{rows.map((r, i) => <tr key={r.id} className={r.id === champion ? 'pd-row--champion' : qualify && i < qualify ? 'pd-row--qualify' : undefined}><td>{i + 1}</td>{Object.keys(slotOf).length > 0 && <td><b>{slotOf[r.id] ?? '·'}</b></td>}<td>{r.name}</td><td>{r.played}</td><td>{r.kills}</td><td><b>{r.points}</b></td></tr>)}</tbody>
               </table>
             )}
@@ -189,10 +200,12 @@ function Bracket() {
   const { activeGame, setActiveGame } = useRegistration()
   const game = activeGame === 'ff' ? 'ff' : 'mlbb'
   const [data, setData] = useState(null)
+  const [teams, setTeams] = useState([])
 
   useEffect(() => {
     let active = true
     fetchPublishedStages().then((d) => active && setData(d)).catch(() => active && setData({ stages: [] }))
+    fetchPublicTeams().then((t) => active && setTeams(t)).catch(() => {})
     return () => { active = false }
   }, [])
 
@@ -217,7 +230,7 @@ function Bracket() {
       ) : stages.map((stage) => (
         <section className="pd-stage" key={stage.id}>
           <h2>{stage.name}</h2>
-          <StageView stage={stage} data={data} />
+          <StageView stage={stage} data={data} teams={teams} />
         </section>
       ))}
     </main>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-// Free Fire: cada sala con sus equipos y el LUGAR que cada equipo tiene en ella.
+// Llaves del torneo (Free Fire): cada sala con sus equipos y el LUGAR EN LA SALA de cada uno.
 // Se toca un equipo para ver sus integrantes, su institución y su carrera.
 export default function RoomList({ teams, logoOf }) {
   const [openId, setOpenId] = useState(null)
@@ -16,7 +16,8 @@ export default function RoomList({ teams, logoOf }) {
       {ordered.map(([room, list]) => (
         <section className="pd-room-card" key={room}>
           <header><h3>Sala {room}</h3><span>{list.length} {list.length === 1 ? 'equipo' : 'equipos'}</span></header>
-          <p className="pd-room-help">El número es el <b>lugar del equipo en la sala</b>. Toca un equipo para ver sus integrantes.</p>
+          <p className="pd-room-help">Toca un equipo para ver sus integrantes.</p>
+          <div className="pd-room-colhead"><span>Lugar en la sala</span><span>Equipo</span></div>
           <ol>
             {[...list].sort((a, b) => (a.slot ?? 99) - (b.slot ?? 99) || a.team_name.localeCompare(b.team_name)).map((team) => {
               const logo = logoOf(team)
@@ -24,7 +25,7 @@ export default function RoomList({ teams, logoOf }) {
               return (
                 <li key={team.id} className={open ? 'pd-room-item pd-room-item--open' : 'pd-room-item'}>
                   <button type="button" className="pd-room-row" aria-expanded={open} onClick={() => setOpenId(open ? null : team.id)}>
-                    <b className="pd-room-num" title="Lugar del equipo en la sala">{team.slot ?? '·'}</b>
+                    <b className="pd-room-num" title="Lugar en la sala">{team.slot ?? '·'}</b>
                     {logo ? <img src={logo} alt="" loading="lazy" className="pd-room-logo" /> : <span className="pd-room-logo pd-room-logo--empty" aria-hidden="true">{team.team_name[0]}</span>}
                     <span className="pd-room-name"><strong>{team.team_name}</strong>{team.institution && <small>{team.institution}</small>}</span>
                     <span className="pd-room-caret" aria-hidden="true">{open ? '▾' : '▸'}</span>

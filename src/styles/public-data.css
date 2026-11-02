@@ -79,7 +79,9 @@
 .pd-room-table + .pd-room-table { margin-top: 1.2rem; }
 
 /* Free Fire: equipos por sala con su número */
-.pd-view-toggle { margin-top: 1rem; }
+.pd-rooms-block { margin-bottom: 1.4rem; }
+.pd-rooms-block > h3 { margin: 0 0 .8rem; font-family: var(--font-display); letter-spacing: .06em; }
+.pd-rooms-block .pd-room-lists { margin-top: 0; }
 .pd-room-lists { list-style: none; margin: 1.6rem auto 0; padding: 0; max-width: 1240px; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start; }
 .pd-room-card { background: var(--panel); border: 1px solid rgba(255,255,255,.09); border-top: 3px solid var(--a1); border-radius: 10px; padding: 1rem 1.1rem; }
 .pd-room-card header { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; margin-bottom: .8rem; }
@@ -90,13 +92,15 @@
 .pd-room-help b { color: #e2e8f0; font-weight: 600; }
 .pd-room-item { border-radius: 8px; background: rgba(255,255,255,.04); overflow: hidden; border: 1px solid transparent; }
 .pd-room-item--open { border-color: color-mix(in srgb, var(--a1) 55%, transparent); background: rgba(255,255,255,.06); }
-.pd-room-row { width: 100%; display: grid; grid-template-columns: 2.4rem 2.2rem 1fr auto; align-items: center; gap: .6rem; padding: .35rem .5rem; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; font: inherit; }
+.pd-room-colhead { display: grid; grid-template-columns: 5.2rem 1fr; gap: .6rem; padding: 0 .5rem .3rem; color: #94a3b8; font-family: var(--font-display); font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; line-height: 1.2; }
+.pd-room-colhead span:last-child { padding-left: 2.8rem; }
+.pd-room-row { width: 100%; display: grid; grid-template-columns: 5.2rem 2.2rem 1fr auto; align-items: center; gap: .6rem; padding: .35rem .5rem; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; font: inherit; }
 .pd-room-row:hover { background: rgba(255,255,255,.05); }
 .pd-room-caret { color: #94a3b8; font-size: .8rem; padding-right: .2rem; }
 .pd-room-detail { padding: .2rem .7rem .8rem; display: grid; gap: .6rem; }
 .pd-room-career { margin: 0; color: #cbd5e1; font-family: var(--font-body); font-size: .8rem; }
 .pd-room-detail .pd-members { border-top: 0; padding-top: 0; }
-.pd-room-num { display: grid; place-items: center; height: 2rem; border-radius: 8px; background: color-mix(in srgb, var(--a1) 30%, transparent); font-family: var(--font-display); font-size: 1rem; font-variant-numeric: tabular-nums; }
+.pd-room-num { display: grid; place-items: center; justify-self: center; width: 2.6rem; height: 2rem; border-radius: 8px; background: color-mix(in srgb, var(--a1) 30%, transparent); font-family: var(--font-display); font-size: 1rem; font-variant-numeric: tabular-nums; }
 .pd-room-logo { width: 2.2rem; height: 2.2rem; border-radius: 7px; object-fit: cover; }
 .pd-room-logo--empty { display: grid; place-items: center; background: rgba(255,255,255,.07); font-family: var(--font-display); }
 .pd-room-name strong { display: block; font-family: var(--font-body); font-size: .92rem; }
