@@ -323,7 +323,8 @@ function Inscription({ modal = false }) {
         school: career,
         otherInstitution: otherInstitution.trim(),
         players: playerSlots.map((_, i) => ({
-          nickname: players[i]?.nickname?.trim() || '',
+          // Los nicknames pueden llevar símbolos o letras decoradas: se conservan tal cual (solo se limpian espacios).
+          nickname: (players[i]?.nickname || '').normalize('NFC').replace(/\s+/g, ' ').trim(),
           game_player_id: players[i]?.id || '',
         })),
         receipt: paymentReceipt,
@@ -554,7 +555,7 @@ function Inscription({ modal = false }) {
                   </div>
                   <input
                     className="compact-input"
-                    maxLength={30}
+                    maxLength={50}
                     name={`player-${index}-nickname`}
                     placeholder={`Nickname ${slot.required ? '*' : '(opcional)'}`}
                     value={players[index]?.nickname || ''}
