@@ -27,6 +27,7 @@ import './styles/public-data.css'
 import './styles/success.css'
 import './styles/teams.css'
 import './styles/schedule.css'
+import './styles/disciplines.css'
 
 function AppContent() {
   const [showSplash, setShowSplash] = useState(true)

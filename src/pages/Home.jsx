@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import Icon from '../components/Icon'
 import { useRegistration } from '../context/RegistrationContext'
 import { audio } from '../lib/audioEngine'
 import CharacterArt from '../components/CharacterArt'
@@ -26,14 +28,26 @@ const formatDeadline = (ms) => {
 
 const divisions = [
   {
-    key: 'mlbb', number: '01', title: 'ESTRATEGIA EN EQUIPO',
-    name: 'Mobile Legends', subtitle: 'BANG BANG', image: '/img/hero-mlbb.jpg',
-    color: '#bb96ff', format: '5V5 · DRAFT PICK',
+    key: 'mlbb',
+    number: '01',
+    name: 'Mobile Legends',
+    subtitle: 'BANG BANG',
+    image: '/img/hero-mlbb.jpg',
+    character: 'kalea',
+    mode: '5V5 · DRAFT PICK',
+    rounds: 'BO1 eliminatorias · BO3 semifinal y final',
+    description: 'Coordinación, estrategia y una sola meta: destruir la base rival.',
   },
   {
-    key: 'ff', number: '02', title: 'SUPERVIVENCIA SIN LÍMITES',
-    name: 'Free Fire', subtitle: 'BATTLE ROYALE', image: '/img/hero-ff.jpg',
-    color: '#f57fbd', format: 'SQUADS · BATTLE ROYALE',
+    key: 'ff',
+    number: '02',
+    name: 'Free Fire',
+    subtitle: 'BATTLE ROYALE',
+    image: '/img/hero-ff.jpg',
+    character: 'deeee',
+    mode: 'SQUADS · BATTLE ROYALE',
+    rounds: 'Puntos por posición + 1 punto por kill',
+    description: 'Aterriza con tu escuadra y compite hasta el último círculo.',
   },
 ]
 
@@ -155,28 +169,54 @@ function Home({ heroEnabled = true }) {
             </div>
           </div>
 
-          <div className="division-section-heading" id="disciplinas">
-            <span className="eyebrow"><i /> DOS DISCIPLINAS. UNA MISMA PASIÓN.</span><span className="section-index">01 / EL TORNEO</span>
-          </div>
-          <div className="hero-divisions-grid">
-            {divisions.map((division) => (
-              <button
-                className={`hero-division-card hero-division-card--${division.key} ${activeGame === division.key ? 'hero-division-card--active' : ''}`}
-                key={division.key} aria-label={`Inscribir equipo en ${division.name} por ${formatSoles(gameConfig[division.key].price)}`} onClick={() => handleInscribe(division.key)} style={{ '--division-color': division.color }} type="button"
-              >
-                <img src={division.image} alt="" className="division-bg-img" loading="lazy" />
-                <span className="division-card-overlay" />
-                <CharacterArt character={division.key === 'mlbb' ? 'kalea' : 'deeee'} className={`division-character ${division.key === 'ff' ? 'division-character--ff' : ''}`} />
-                <span className="division-card-number" aria-hidden="true">{division.number}</span>
-                <div className="division-card-content">
-                  <span className="division-card-tag">{division.title}</span>
-                  <strong className="division-card-name">{division.name}<small>{division.subtitle}</small></strong>
-                  <small className="division-card-detail">{rosterText(division.key)}</small>
-                  <div className="division-card-bottom"><span>{division.format}</span><span className="division-card-action">{formatSoles(gameConfig[division.key].price)} / EQUIPO <b aria-hidden="true">↗</b></span></div>
+        </div>
+      </section>
+
+      <section className="disciplines-section" id="disciplinas" aria-labelledby="disciplines-title">
+        <div className="template-section-title">
+          <span>01 / ELIGE TU DISCIPLINA</span>
+          <h2 id="disciplines-title">Dos juegos. <em>Una arena.</em></h2>
+          <p>Consulta el formato, reúne a tu equipo y elige dónde competir.</p>
+        </div>
+        <div className="discipline-grid">
+          {divisions.map((division) => (
+            <article className={`discipline-panel discipline-panel--${division.key}`} key={division.key}>
+              <img className="discipline-panel-background" src={division.image} alt="" loading="lazy" />
+              <CharacterArt character={division.character} className="discipline-panel-character" />
+              <div className="discipline-panel-copy">
+                <span className="discipline-panel-mode">{division.number} / {division.mode}</span>
+                <h3>{division.name}<small>{division.subtitle}</small></h3>
+                <p>{division.description}</p>
+                <ul className="discipline-facts">
+                  <li>
+                    <Icon name="users" size={15} />
+                    {`${gameConfig[division.key].starters} titulares + ${gameConfig[division.key].substitutes} suplente(s)`}
+                  </li>
+                  <li>
+                    <Icon name="trophy" size={15} />
+                    {division.rounds}
+                  </li>
+                </ul>
+                <div className="discipline-panel-actions">
+                  <button type="button" onClick={() => handleInscribe(division.key)}>
+                    INSCRIBIR EQUIPO <Icon name="arrow-up-right" size={16} />
+                  </button>
+                  <strong>
+                    {formatSoles(gameConfig[division.key].price)}
+                    <small>POR EQUIPO</small>
+                  </strong>
                 </div>
-              </button>
-            ))}
-          </div>
+                <a className="discipline-rules-link" href="#reglamento" onClick={() => exploreRules(division.key)}>
+                  Consultar reglamento <Icon name="arrow-right" size={14} />
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="competition-shortcuts">
+          <span>LA COMPETENCIA, EN UN SOLO LUGAR.</span>
+          <Link to="/equipos">Equipos confirmados <Icon name="arrow-up-right" size={16} /></Link>
+          <Link to="/llaves">Fixture y resultados <Icon name="arrow-up-right" size={16} /></Link>
         </div>
       </section>
 
