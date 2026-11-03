@@ -64,7 +64,7 @@ function AppContent() {
     audio.start()
     audio.arenaEnter()
     setAudioStarted(true)
-    window.setTimeout(() => setShowSplash(false), 850)
+    window.setTimeout(() => setShowSplash(false), 1050)
   }
 
   return (
