@@ -1,7 +1,7 @@
 /* Brand finish shared with the event pages. */
 :root { --brand-solid: #7c3aed; --brand-light: #c7a7ff; }
 .site-header { background: #0c0913ee; border-color: #b695e526; }
-.brand-mark { background: #0d0914; box-shadow: 2px 2px 0 #a14cff, 0 0 14px #9d5cff25; font-style: normal; }
+.brand-mark, .brand-logo { background: transparent; border: none; box-shadow: none; font-style: normal; }
 .brand-title em { color: #a66bff; }
 .hero-gradient-text, :root[data-game="ff"] .hero-gradient-text { background-image: none; background-clip: initial; -webkit-background-clip: initial; color: #c6a5ff; }
 :root[data-game="ff"] .hero-gradient-text { color: #f0a1d5; }
@@ -12,8 +12,8 @@
 .hero-btn-primary:hover, .nav-cta:hover, .mlbb-register-button:hover, .wizard-btn-next:hover, .registration-submit:hover { background: #8c49ee; color: #fff; filter: none; }
 .ff-showcase .mlbb-register-button { background: #b52c83; color: #fff; }
 .ff-showcase .mlbb-register-button:hover { background: #c83c95; color: #fff; }
-.nav-switch-tab--active.nav-switch-tab--mlbb { background: #7134c9; color: #fff; box-shadow: none; }
-.nav-switch-tab--active.nav-switch-tab--ff { background: #a82778; color: #fff; box-shadow: none; }
+.nav-switch-tab--active.nav-switch-tab--mlbb { background: rgba(113, 52, 201, 0.32); border-color: #a855f7; box-shadow: 0 0 14px rgba(168, 85, 247, 0.4); }
+.nav-switch-tab--active.nav-switch-tab--ff { background: rgba(168, 39, 120, 0.32); border-color: #f43f5e; box-shadow: 0 0 14px rgba(244, 63, 94, 0.4); }
 .template-section-title h2, .mlbb-showcase-copy h2 { font-weight: 700; }
 .rules-tab--active.rules-tab--mlbb { background: #221135; color: #d9bfff; border-color: #a568ed99; }
 .rules-tab--active.rules-tab--ff { background: #301125; color: #f6b6dd; border-color: #d85da199; }
