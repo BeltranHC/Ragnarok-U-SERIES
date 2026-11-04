@@ -3,7 +3,7 @@
    ========================================================================== */
 
 :root {
-  --page-gutter: clamp(18px, 2vw, 48px);
+  --page-gutter: clamp(16px, 1.8vw, 48px);
 }
 
 .ui-icon {
@@ -13,10 +13,12 @@
 }
 
 .disciplines-section {
-  width: min(1340px, calc(100% - var(--page-gutter) * 2));
-  margin: 3rem auto 2rem;
+  width: calc(100% - var(--page-gutter) * 2);
+  max-width: none;
+  margin: 1.25rem auto 2rem;
   scroll-margin-top: 6rem;
-  padding: 0 1rem;
+  padding: 1.5rem 0 0;
+  border-top: 1px solid rgba(162, 116, 209, 0.18);
 }
 
 .template-section-title {
