@@ -80,6 +80,111 @@
 .template-prize-grid strong { margin:1.65rem 0 .7rem; font-size:clamp(2.7rem,4.3vw,5.5rem); font-weight:700; }
 .template-prize-grid small { font-size:.9rem; color:#b8a5cc; }
 .prize-card-line { left:2.3rem; bottom:1.8rem; width:40px; background:#9c6ac6; }
+/* TBA Prize Banner & Hero */
+.hero-prize-amount--tba {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: clamp(1.6rem, 2.3vw, 2.5rem);
+  letter-spacing: -0.02em;
+}
+.hero-prize-amount--tba .ui-icon {
+  color: #c084fc;
+}
+.tba-prize-banner {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.65fr) minmax(0, 1.8fr) minmax(180px, 0.75fr);
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  padding: clamp(2rem, 3.5vw, 3.5rem) clamp(1.5rem, 3vw, 3.5rem);
+  background: linear-gradient(140deg, #1b0f2bcc, #100a1ce6);
+  border: 1px solid rgba(162, 116, 209, 0.28);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.tba-prize-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(138, 77, 219, 0.12), transparent 70%);
+  pointer-events: none;
+}
+.tba-prize-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.85rem;
+  color: #ad83ed;
+  border-right: 1px solid rgba(162, 116, 209, 0.18);
+  padding-right: 1.5rem;
+}
+.tba-prize-badge span {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  color: #9d85b5;
+}
+.tba-prize-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+.tba-prize-kicker {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #b592e3;
+}
+.tba-prize-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 4.2vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #fff;
+  line-height: 1.05;
+}
+.tba-prize-center p {
+  margin: 0.35rem 0 0;
+  max-width: 50ch;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: #ab9bbf;
+}
+.tba-prize-places {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-left: 1px solid rgba(162, 116, 209, 0.18);
+  padding-left: 1.5rem;
+}
+.tba-place-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.tba-place-num {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #a879e6;
+}
+.tba-place-label {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #d1c2e6;
+}
+
 
 /* Registration guidance (Esports Timeline). */
 .participation-section { position:relative; }
@@ -313,6 +418,10 @@
  .template-prize-grid { grid-template-columns:1fr; }
  .template-prize-grid .prize-card { min-height:240px; padding:1.8rem; }
  .template-prize-grid strong { font-size:3.4rem; }
+ .tba-prize-banner { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; padding: 2rem 1.25rem; }
+ .tba-prize-badge { border-right: none; border-bottom: 1px solid rgba(162,116,209,0.18); padding-right: 0; padding-bottom: 1rem; }
+ .tba-prize-places { border-left: none; border-top: 1px solid rgba(162,116,209,0.18); padding-left: 0; padding-top: 1rem; flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 1.25rem; }
+
  .template-prize-grid small { font-size:.83rem; }
  .prize-card-line { left:1.8rem; }
  .participation-header { flex-direction:column; align-items:flex-start; gap:1rem; margin-bottom:1.5rem; padding-bottom:1.2rem; }
