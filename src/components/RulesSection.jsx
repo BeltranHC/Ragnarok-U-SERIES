@@ -194,7 +194,7 @@ function RulesSection() {
         <h2 id="rules-title">CONOCE LAS REGLAS.<br /><em>DOMINA LA ARENA.</em></h2>
         <p>
           Extraído directamente de las bases aprobadas para RAGNAROK U-Series 2026.
-          Selecciona tu disciplina para revisar las reglas oficiales o descargar el PDF firmado.
+          Selecciona tu disciplina para revisar las reglas oficiales.
         </p>
       </div>
 
@@ -206,7 +206,7 @@ function RulesSection() {
             className={`rules-tab ${activeTab === 'mlbb' ? 'rules-tab--active rules-tab--mlbb' : ''}`}
             onClick={() => switchTab('mlbb')}
           >
-            <span>⚔️ BASES MOBILE LEGENDS</span>
+            <span>BASES MOBILE LEGENDS</span>
             <small>5V5 DRAFT PICK</small>
           </button>
           <button
@@ -214,7 +214,7 @@ function RulesSection() {
             className={`rules-tab ${activeTab === 'ff' ? 'rules-tab--active rules-tab--ff' : ''}`}
             onClick={() => switchTab('ff')}
           >
-            <span>🔥 BASES FREE FIRE</span>
+            <span>BASES FREE FIRE</span>
             <small>BATTLE ROYALE SQUADS</small>
           </button>
         </div>
@@ -304,22 +304,6 @@ function RulesSection() {
 
       </div>
 
-      {/* Pie con llamada a descargar y nota legal */}
-      <div className="rules-footer-note">
-        <p>
-          ¿Deseas guardar o imprimir el reglamento completo firmado por la organización?
-        </p>
-        <a
-          href={activeData.pdfUrl}
-          download={activeData.pdfName}
-          className="rules-footer-download-btn"
-          style={{ '--btn-accent': activeData.accent }}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          📄 DESCARGAR DOCUMENTO OFICIAL ({activeData.pdfName})
-        </a>
-      </div>
     </section>
   )
 }
