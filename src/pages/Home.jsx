@@ -66,13 +66,7 @@ function resetArtwork(event) {
 function Home({ heroEnabled = true }) {
   const { openRegistration, activeGame, setActiveGame, isRegistrationOpen } = useRegistration()
   const { deadline, games: gameConfig, prizes, prizeTotal, availability } = useTournament()
-  const rosterText = (key) => {
-    const { starters, substitutes } = gameConfig[key]
-    return `${starters} titulares${substitutes ? ` + ${substitutes === 1 ? '1 suplente' : `hasta ${substitutes} suplentes`}` : ''}`
-  }
-  const slotsText = (key) => (availability?.[key] ? ` · ${availability[key].taken >= availability[key].max ? 'Cupos agotados' : `Quedan ${availability[key].max - availability[key].taken} cupos`}` : '')
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(deadline))
-  const isFreeFire = activeGame === 'ff'
   const { game: heroGame, autoplay, selectGame: selectHeroGame, toggleAutoplay, containerRef } = useHeroRotation(activeGame, heroEnabled && !isRegistrationOpen)
   const isHeroFreeFire = heroGame === 'ff'
 
@@ -220,57 +214,7 @@ function Home({ heroEnabled = true }) {
         </div>
       </section>
 
-      {!isFreeFire && (
-        <section className="mlbb-showcase" aria-labelledby="mlbb-title">
-          <div className="mlbb-showcase-visual">
-            <span className="mlbb-showcase-monogram" aria-hidden="true">M</span>
-            <div className="arena-orbit" aria-hidden="true" />
-            <CharacterArt character="marcel" className="showcase-character" />
-            <span className="mlbb-art-caption">MOBILE LEGENDS: BANG BANG <i /> DIVISIÓN 01</span>
-          </div>
-          <div className="mlbb-showcase-copy">
-            <span className="eyebrow">COORDINA. DOMINA. HAZ HISTORIA.</span>
-            <h2 id="mlbb-title">Cinco jugadores.<br /><span>Una sola jugada.</span></h2>
-            <p>El talento gana duelos. Un equipo gana la partida. Lleva a tu escuadra a la Tierra del Amanecer y defiende los colores de tu universidad.</p>
-            <div className="mlbb-format-grid">
-              <div><strong>{gameConfig.mlbb.starters} + {gameConfig.mlbb.substitutes}</strong><span>Titulares + suplentes</span></div>
-              <div><strong>DRAFT</strong><span>Modo torneo 5v5</span></div>
-              <div><strong>BO3</strong><span>Semifinal y final</span></div>
-            </div>
-            <div className="mlbb-showcase-actions">
-              <button className="mlbb-register-button" type="button" onClick={() => handleInscribe('mlbb')}>JUGAR EN MLBB <span aria-hidden="true">↗</span></button>
-              <a href="#reglamento" onClick={() => exploreRules('mlbb')}>Conoce las reglas <span aria-hidden="true">→</span></a>
-            </div>
-            <span className="mlbb-showcase-note">{formatSoles(gameConfig.mlbb.price)} por equipo · Hasta {gameConfig.mlbb.substitutes} suplentes opcionales{slotsText('mlbb')}</span>
-          </div>
-        </section>
-      )}
 
-      {activeGame !== 'mlbb' && (
-        <section className="mlbb-showcase ff-showcase" aria-labelledby="ff-title">
-          <div className="mlbb-showcase-visual">
-            <span className="mlbb-showcase-monogram" aria-hidden="true">FF</span>
-            <div className="arena-orbit" aria-hidden="true" />
-            <CharacterArt character="miguel" className="showcase-character showcase-character--ff" />
-            <span className="mlbb-art-caption">FREE FIRE <i /> DIVISIÓN 02 / BATTLE ROYALE</span>
-          </div>
-          <div className="mlbb-showcase-copy">
-            <span className="eyebrow">CAE. COORDINA. SOBREVIVE.</span>
-            <h2 id="ff-title">Cuatro jugadores.<br /><span>Un solo Booyah.</span></h2>
-            <p>Cada rotación cuenta. Cada compañero también. Aterriza con tu escuadra en Bermuda, Purgatorio y Kalahari y pelea por llevar a tu universidad hasta el último círculo.</p>
-            <div className="mlbb-format-grid">
-              <div><strong>{gameConfig.ff.starters} + {gameConfig.ff.substitutes}</strong><span>Titulares + suplente</span></div>
-              <div><strong>SQUADS</strong><span>Battle Royale</span></div>
-              <div><strong>+1 / KILL</strong><span>Punto por eliminación</span></div>
-            </div>
-            <div className="mlbb-showcase-actions">
-              <button className="mlbb-register-button ff-register-button" type="button" onClick={() => handleInscribe('ff')}>JUGAR EN FREE FIRE <span aria-hidden="true">↗</span></button>
-              <a href="#reglamento" onClick={() => exploreRules('ff')}>Conoce las reglas <span aria-hidden="true">→</span></a>
-            </div>
-            <span className="mlbb-showcase-note">{formatSoles(gameConfig.ff.price)} por equipo · {gameConfig.ff.substitutes} suplente opcional{slotsText('ff')}</span>
-          </div>
-        </section>
-      )}
 
       <section className="template-prizes" id="premios" aria-labelledby="prizes-title">
         <div className="template-section-title">
