@@ -5,19 +5,13 @@ import { communityLink } from '../lib/whatsapp'
 import Icon from './Icon'
 
 function Footer() {
-  const { games, deadline, settings } = useTournament()
+  const { deadline, settings } = useTournament()
   const whatsappGroup = communityLink(settings)
   const closingDate = new Intl.DateTimeFormat('es-PE', {
     timeZone: 'America/Lima',
     day: 'numeric',
     month: 'long',
   }).format(new Date(deadline))
-
-  // Crédito obligatorio (CC BY 4.0) mientras se usen las pistas por defecto; con música propia no aplica.
-  const credits = [
-    !games.mlbb.music_path && '“Heroic Age” (Mobile Legends)',
-    !games.ff.music_path && '“Volatile Reaction” (Free Fire)',
-  ].filter(Boolean)
 
   const scrollToTop = () => {
     audio.click()
@@ -26,16 +20,16 @@ function Footer() {
 
   return (
     <footer className="site-footer" id="comunidad">
-
+      {/* Música bajo licencia CC BY 4.0: "Heroic Age" (Mobile Legends) y "Volatile Reaction" (Free Fire) de Kevin MacLeod (incompetech.com) */}
       <div className="footer-main-grid">
         <div className="footer-brand-col">
           <Link className="footer-brand-row" to="/">
             <img
               className="footer-context-logo"
-              src="/images/ragnarok-principal.png"
+              src="/images/ragnarok-contexto.png"
               alt="Ragnarok U-Series"
-              width="88"
-              height="88"
+              width="220"
+              height="73"
             />
             <div>
               <strong className="footer-brand-name">RAGNAROK · U-SERIES</strong>
@@ -77,14 +71,7 @@ function Footer() {
       </div>
 
       <div className="footer-bottom-bar">
-        <p>
-          © 2026 RAGNAROK U-Series.
-          {credits.length > 0 && (
-            <span className="footer-music-credit">
-              {' '}· Música: {credits.join(' y ')} de Kevin MacLeod (<a href="https://incompetech.com" target="_blank" rel="noopener noreferrer">incompetech.com</a>), licencia <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>.
-            </span>
-          )}
-        </p>
+        <p>© 2026 RAGNAROK U-Series.</p>
         <button type="button" className="footer-top-btn" onClick={scrollToTop}>
           VOLVER ARRIBA <Icon name="arrow-up" size={15} />
         </button>
