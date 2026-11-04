@@ -20,7 +20,7 @@ function Footer() {
 
   return (
     <footer className="site-footer" id="comunidad">
-      {/* Música bajo licencia CC BY 4.0: "Heroic Age" (Mobile Legends) y "Volatile Reaction" (Free Fire) de Kevin MacLeod (incompetech.com) */}
+      {/* Música: Warsongs Piercing Light */}
       <div className="footer-main-grid">
         <div className="footer-brand-col">
           <Link className="footer-brand-row" to="/">
@@ -65,7 +65,8 @@ function Footer() {
             <li><Link to="/equipos">Equipos confirmados</Link></li>
             <li><Link to="/llaves">Fixture y resultados</Link></li>
             <li><span>Temporada 2026</span></li>
-            <li><span>Cierre: {closingDate}</span></li>
+            <li><span>Cierre inscripciones: {closingDate}</span></li>
+            <li><span>Inicio torneo: 23 de noviembre</span></li>
           </ul>
         </div>
       </div>

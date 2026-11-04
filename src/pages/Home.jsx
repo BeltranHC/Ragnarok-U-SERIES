@@ -8,7 +8,6 @@ import RulesSection from '../components/RulesSection'
 import RegistrationSteps from '../components/RegistrationSteps'
 import useHeroRotation from '../hooks/useHeroRotation'
 import { useTournament } from '../context/TournamentContext'
-import { formatSoles } from '../lib/money'
 import { communityLink } from '../lib/whatsapp'
 
 function getTimeLeft(deadline) {
@@ -21,10 +20,11 @@ function getTimeLeft(deadline) {
   ]
 }
 
+const DAYS = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB']
 const MONTHS = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC']
 const formatDeadline = (ms) => {
   const d = new Date(ms)
-  return `${d.getDate()} ${MONTHS[d.getMonth()]} / ${d.getFullYear()}`
+  return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} / ${d.getFullYear()}`
 }
 
 const divisions = [
@@ -66,7 +66,7 @@ function resetArtwork(event) {
 
 function Home({ heroEnabled = true }) {
   const { openRegistration, activeGame, setActiveGame, isRegistrationOpen } = useRegistration()
-  const { deadline, games: gameConfig, prizes, prizeTotal, availability, settings } = useTournament()
+  const { deadline, games: gameConfig, prizes, availability, settings } = useTournament()
   const whatsappGroup = communityLink(settings)
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(deadline))
   const { game: heroGame, autoplay, selectGame: selectHeroGame, toggleAutoplay, containerRef } = useHeroRotation(activeGame, heroEnabled && !isRegistrationOpen)
@@ -108,18 +108,20 @@ function Home({ heroEnabled = true }) {
                 La próxima gran jugada lleva el nombre de tu universidad.
                 Reúne a tu equipo y entra a la arena de Mobile Legends y Free Fire.
               </p>
-              <div className="hero-prize-pool">
-                {prizeTotal > 0 ? (
-                  <>
-                    <strong className="hero-prize-amount"><span>S/</span> {prizeTotal.toLocaleString('es-PE')}</strong>
-                    <div><span className="hero-prize-kicker">BOLSA DE PREMIOS</span><small className="hero-prize-note">En efectivo · Dos disciplinas</small></div>
-                  </>
-                ) : (
-                  <>
-                    <strong className="hero-prize-amount hero-prize-amount--tba"><Icon name="trophy" size={24} /> POR ANUNCIAR</strong>
-                    <div><span className="hero-prize-kicker">BOLSA DE PREMIOS</span><small className="hero-prize-note">Según equipos inscritos.</small></div>
-                  </>
-                )}
+              <div className="hero-prize-pool hero-prize-pool--incognito">
+                <div className="hero-prize-incognito-header">
+                  <span className="hero-prize-incognito-badge">
+                    <span className="incognito-pulse-dot" aria-hidden="true" />
+                    INCÓGNITO
+                  </span>
+                  <strong className="hero-prize-amount hero-prize-amount--incognito">
+                    PRÓXIMAMENTE
+                  </strong>
+                </div>
+                <div>
+                  <span className="hero-prize-kicker">BOLSA DE PREMIOS OFICIAL</span>
+                  <small className="hero-prize-note">En efectivo · Pozo por revelar para ambas disciplinas</small>
+                </div>
               </div>
               <div className="hero-cta-group">
                 <button onClick={() => handleInscribe(heroGame)} type="button" className="hero-btn-primary clip-corner">
@@ -146,6 +148,10 @@ function Home({ heroEnabled = true }) {
                       <span className="countdown-unit">{label}</span>
                     </div>
                   ))}
+                </div>
+                <div className="hero-tournament-start-notice">
+                  <span className="tournament-start-icon">⚡</span>
+                  <span>Torneo inicia: <strong>Lunes 23 de Noviembre</strong></span>
                 </div>
               </div>
             </div>
@@ -212,14 +218,10 @@ function Home({ heroEnabled = true }) {
                   <button type="button" onClick={() => handleInscribe(division.key)}>
                     INSCRIBIR EQUIPO <Icon name="arrow-up-right" size={16} />
                   </button>
-                  <strong>
-                    {formatSoles(gameConfig[division.key].price)}
-                    <small>POR EQUIPO</small>
-                  </strong>
+                  <a className="discipline-rules-link" href="#reglamento" onClick={() => exploreRules(division.key)}>
+                    Consultar reglamento <Icon name="arrow-right" size={14} />
+                  </a>
                 </div>
-                <a className="discipline-rules-link" href="#reglamento" onClick={() => exploreRules(division.key)}>
-                  Consultar reglamento <Icon name="arrow-right" size={14} />
-                </a>
               </div>
             </article>
           ))}
@@ -231,53 +233,34 @@ function Home({ heroEnabled = true }) {
         </div>
       </section>
 
-
-
       <section className="template-prizes" id="premios" aria-labelledby="prizes-title">
         <div className="template-section-title">
-          <span>02 / PREMIOS Y RECONOCIMIENTO</span>
-          <h2 id="prizes-title">{prizeTotal > 0 ? <>LA GLORIA TAMBIÉN<br /><em>SE LLEVA A CASA.</em></> : <>Juega por <em>la gloria.</em></>}</h2>
+          <span>02 / PREMIOS Y RECONOCIMIENTO · INCÓGNITO</span>
+          <h2 id="prizes-title">Juega por <em>la gloria.</em></h2>
           <p>
-            {prizeTotal > 0
-              ? 'Compite por tu universidad. Deja tu nombre en lo más alto.'
-              : 'La bolsa de premios se anunciará según la cantidad de equipos inscritos en cada categoría.'}
+            La bolsa de premios oficial se anunciará próximamente según los equipos inscritos. Trofeo y reconocimiento institucional para los mejores de cada división.
           </p>
         </div>
-        {prizeTotal > 0 ? (
-          <div className="template-prize-grid">
-            {prizes.map((prize) => (
-              <article className={`prize-card ${prize.place === 1 ? 'prize-card--champion' : ''}`} key={prize.place}>
-                <span className="prize-card-place">{String(prize.place).padStart(2, '0')}</span>
-                <span>{prize.label}</span>
-                <strong>{prize.amount > 0 ? formatSoles(prize.amount) : 'POR ANUNCIAR'}</strong>
-                <small>{prize.description}</small>
-                <span className="prize-card-line" aria-hidden="true" />
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="tba-prize-banner">
-            <div className="tba-prize-badge">
-              <Icon name="trophy" size={30} />
-              <span>RECOMPENSA<br />EN CONSTRUCCIÓN</span>
-            </div>
-            <div className="tba-prize-center">
-              <span className="tba-prize-kicker">BOLSA DE PREMIOS</span>
-              <h3 className="tba-prize-title">POR ANUNCIAR</h3>
-              <p>
-                La competencia crece con cada escuadra. Los premios finales se comunicarán cuando se cierre el registro de cada categoría.
-              </p>
-            </div>
-            <div className="tba-prize-places">
-              {prizes.map((prize) => (
-                <div key={prize.place} className="tba-place-row">
-                  <span className="tba-place-num">{String(prize.place).padStart(2, '0')}</span>
-                  <span className="tba-place-label">{prize.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="template-prize-grid">
+          {prizes.map((prize) => (
+            <article className={`prize-card ${prize.place === 1 ? 'prize-card--champion' : ''} prize-card--incognito`} key={prize.place}>
+              <span className="prize-card-place">{String(prize.place).padStart(2, '0')}</span>
+              <span className="prize-card-label">{prize.label}</span>
+              <div className="prize-incognito-box">
+                <strong className="prize-incognito-text">PRÓXIMAMENTE</strong>
+                <span className="prize-incognito-sub">// INCÓGNITO</span>
+              </div>
+              <small className="prize-card-desc">
+                {prize.place === 1
+                  ? 'Trofeo oficial Ragnarok + Reconocimiento universitario y bolsa en efectivo'
+                  : prize.place === 2
+                  ? 'Medallas oficiales de plata + Reconocimiento institucional y premio en efectivo'
+                  : 'Medallas oficiales de bronce + Reconocimiento oficial y premio en efectivo'}
+              </small>
+              <span className="prize-card-line" aria-hidden="true" />
+            </article>
+          ))}
+        </div>
       </section>
       <RegistrationSteps />
       <RulesSection />

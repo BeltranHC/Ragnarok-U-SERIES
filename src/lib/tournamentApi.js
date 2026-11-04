@@ -4,7 +4,7 @@ import { isSupabaseConfigured, supabase } from '../supabaseClient'
 export const FALLBACK_CONFIG = {
   settings: {
     registration_open: true,
-    registration_deadline: '2026-12-15T23:59:59-05:00',
+    registration_deadline: '2026-11-21T23:59:59-05:00',
     yape_number: '',
     yape_holder: '',
     yape_qr_path: null,

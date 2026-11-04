@@ -533,3 +533,147 @@ html { color-scheme: dark; scrollbar-color: #68448d #100b18; scrollbar-width: th
 .registration-modal::-webkit-scrollbar-thumb { background: #775099; border: 2px solid #130b1f; border-radius: 8px; }
 .footer-tag--orange { color: #f198d2; border-color: #e36bb347; background: #c5488d18; }
 .brand-mark { width: 42px; font-size: 1.05rem; letter-spacing: -0.16em; }
+
+
+/* =========================================================
+   PREMIO EN INCÓGNITO / PRÓXIMAMENTE (HERO & TARJETAS)
+   ========================================================= */
+
+.hero-prize-pool--incognito {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.25rem 0 0.25rem 1.15rem;
+  border-left: 2px solid var(--a1, #b188ff);
+}
+
+.hero-prize-incognito-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hero-prize-incognito-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  padding: 0.18rem 0.55rem;
+  border-radius: 2px;
+  width: fit-content;
+  text-transform: uppercase;
+}
+
+.incognito-pulse-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 8px #fbbf24;
+  animation: incognitoPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes incognitoPulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
+.hero-prize-amount--incognito {
+  font-family: var(--font-display) !important;
+  font-size: clamp(1.85rem, 2.7vw, 3.2rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  background: linear-gradient(100deg, #ffffff 15%, #c4a1ff 55%, #ffffff 95%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  line-height: 1.08;
+  margin: 0.1rem 0;
+}
+
+:root[data-game="ff"] .hero-prize-amount--incognito {
+  background: linear-gradient(100deg, #ffffff 15%, #ff9f1c 55%, #ffffff 95%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Tarjetas de premios en modo incógnito */
+.prize-card--incognito {
+  position: relative;
+}
+
+.prize-incognito-box {
+  margin: 1.4rem 0 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.prize-incognito-text {
+  font-family: var(--font-display) !important;
+  font-size: clamp(1.6rem, 2.4vw, 2.5rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  color: #fbbf24 !important;
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.25);
+  line-height: 1.1;
+}
+
+.prize-card--champion .prize-incognito-text {
+  color: #fde047 !important;
+  text-shadow: 0 0 25px rgba(253, 224, 71, 0.4);
+}
+
+.prize-incognito-sub {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #bfaedc;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .hero-prize-pool--incognito {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-left: 0.85rem;
+  }
+  .hero-prize-amount--incognito {
+    font-size: 2rem !important;
+  }
+}
+
+.hero-tournament-start-notice {
+  margin-top: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.32);
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: #e9d5ff;
+}
+
+.hero-tournament-start-notice strong {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.tournament-start-icon {
+  color: #fbbf24;
+  font-size: 0.85rem;
+}

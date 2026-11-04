@@ -32,6 +32,10 @@ export default defineConfig({
   plugins: [react(), injectCsp],
   // Keep dependency caches outside Dropbox and separate for each checkout.
   cacheDir: join(tmpdir(), 'esports-tournament-manager', projectKey, 'vite'),
+  build: {
+    // Evita EPERM de rmSync en Windows cuando Dropbox u otros procesos bloquean dist/
+    emptyOutDir: false,
+  },
   server: {
     watch: {
       // Git ignores do not prevent Vite from watching local QA/browser files.

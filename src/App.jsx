@@ -37,10 +37,10 @@ function AppContent() {
   const mlbbMusic = games.mlbb.music_path
   const ffMusic = games.ff.music_path
 
-  // Música de fondo de cada juego: el archivo subido desde el panel (Supabase) o, si no hay,
-  // /audio/mlbb.mp3 y /audio/ff.mp3 de la carpeta public. Sin archivo, ese juego queda en silencio.
+  // Música de fondo: Warsongs Piercing Light.mp3 de la carpeta public.
   useEffect(() => {
     let active = true
+    const warsongsTrack = encodeURI('/audio/Warsongs Piercing Light.mp3')
     const resolve = async (path, fallback) => {
       const remote = publicUrl('public-assets', path)
       if (remote) return remote
@@ -51,9 +51,15 @@ function AppContent() {
         return null
       }
     }
-    Promise.all([resolve(mlbbMusic, '/audio/mlbb.mp3'), resolve(ffMusic, '/audio/ff.mp3')])
-      .then(([mlbb, ff]) => { if (active) audio.setTracks({ mlbb, ff }) })
-    return () => { active = false }
+    Promise.all([
+      resolve(mlbbMusic, warsongsTrack),
+      resolve(ffMusic, warsongsTrack),
+    ]).then(([mlbb, ff]) => {
+      if (active) audio.setTracks({ mlbb: mlbb || warsongsTrack, ff: ff || warsongsTrack })
+    })
+    return () => {
+      active = false
+    }
   }, [mlbbMusic, ffMusic])
 
   // El tema cambia con el juego elegido (sin elegir, suena el de Mobile Legends).
@@ -109,4 +115,3 @@ function App() {
 }
 
 export default App
-
