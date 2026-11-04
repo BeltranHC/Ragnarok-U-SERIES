@@ -9,6 +9,7 @@ import RegistrationSteps from '../components/RegistrationSteps'
 import useHeroRotation from '../hooks/useHeroRotation'
 import { useTournament } from '../context/TournamentContext'
 import { communityLink } from '../lib/whatsapp'
+import { formatSoles } from '../lib/money'
 
 function getTimeLeft(deadline) {
   const time = Math.max(deadline - Date.now(), 0)
@@ -66,7 +67,7 @@ function resetArtwork(event) {
 
 function Home({ heroEnabled = true }) {
   const { openRegistration, activeGame, setActiveGame, isRegistrationOpen } = useRegistration()
-  const { deadline, games: gameConfig, prizes, availability, settings } = useTournament()
+  const { deadline, games: gameConfig, prizes, prizeTotal, availability, settings } = useTournament()
   const whatsappGroup = communityLink(settings)
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(deadline))
   const { game: heroGame, autoplay, selectGame: selectHeroGame, toggleAutoplay, containerRef } = useHeroRotation(activeGame, heroEnabled && !isRegistrationOpen)
@@ -108,19 +109,11 @@ function Home({ heroEnabled = true }) {
                 La próxima gran jugada lleva el nombre de tu universidad.
                 Reúne a tu equipo y entra a la arena de Mobile Legends y Free Fire.
               </p>
-              <div className="hero-prize-pool hero-prize-pool--incognito">
-                <div className="hero-prize-incognito-header">
-                  <span className="hero-prize-incognito-badge">
-                    <span className="incognito-pulse-dot" aria-hidden="true" />
-                    INCÓGNITO
-                  </span>
-                  <strong className="hero-prize-amount hero-prize-amount--incognito">
-                    PRÓXIMAMENTE
-                  </strong>
-                </div>
+              <div className="hero-prize-pool hero-prize-pool--published">
+                <strong className="hero-prize-amount">{formatSoles(prizeTotal, 2)}</strong>
                 <div>
-                  <span className="hero-prize-kicker">BOLSA DE PREMIOS OFICIAL</span>
-                  <small className="hero-prize-note">En efectivo · Pozo por revelar para ambas disciplinas</small>
+                  <span className="hero-prize-kicker">BOLSA TOTAL DE PREMIOS</span>
+                  <small className="hero-prize-note">Total de los premios por puesto</small>
                 </div>
               </div>
               <div className="hero-cta-group">
@@ -235,28 +228,17 @@ function Home({ heroEnabled = true }) {
 
       <section className="template-prizes" id="premios" aria-labelledby="prizes-title">
         <div className="template-section-title">
-          <span>02 / PREMIOS Y RECONOCIMIENTO · INCÓGNITO</span>
+          <span>02 / PREMIOS Y RECONOCIMIENTO</span>
           <h2 id="prizes-title">Juega por <em>la gloria.</em></h2>
-          <p>
-            La bolsa de premios oficial se anunciará próximamente según los equipos inscritos. Trofeo y reconocimiento institucional para los mejores de cada división.
-          </p>
+          <p>Consulta el premio de cada puesto.</p>
         </div>
         <div className="template-prize-grid">
           {prizes.map((prize) => (
-            <article className={`prize-card ${prize.place === 1 ? 'prize-card--champion' : ''} prize-card--incognito`} key={prize.place}>
+            <article className={`prize-card ${Number(prize.place) === 1 ? 'prize-card--champion' : ''}`} key={prize.place}>
               <span className="prize-card-place">{String(prize.place).padStart(2, '0')}</span>
               <span className="prize-card-label">{prize.label}</span>
-              <div className="prize-incognito-box">
-                <strong className="prize-incognito-text">PRÓXIMAMENTE</strong>
-                <span className="prize-incognito-sub">// INCÓGNITO</span>
-              </div>
-              <small className="prize-card-desc">
-                {prize.place === 1
-                  ? 'Trofeo oficial Ragnarok + Reconocimiento universitario y bolsa en efectivo'
-                  : prize.place === 2
-                  ? 'Medallas oficiales de plata + Reconocimiento institucional y premio en efectivo'
-                  : 'Medallas oficiales de bronce + Reconocimiento oficial y premio en efectivo'}
-              </small>
+              <strong className="prize-card-amount">{formatSoles(prize.amount, 2)}</strong>
+              {prize.description && <small className="prize-card-desc">{prize.description}</small>}
               <span className="prize-card-line" aria-hidden="true" />
             </article>
           ))}

@@ -679,3 +679,7 @@ html { color-scheme: dark; scrollbar-color: #68448d #100b18; scrollbar-width: th
   color: #fbbf24;
   font-size: 0.85rem;
 }
+
+/* Fit the configured prize amounts in the existing cards. */
+.hero-prize-pool--published { flex-wrap: wrap; gap: .75rem 1rem; }
+.template-prize-grid strong.prize-card-amount { font-size: clamp(1.8rem, 3vw, 3.3rem); letter-spacing: -.04em; overflow-wrap: anywhere; }
