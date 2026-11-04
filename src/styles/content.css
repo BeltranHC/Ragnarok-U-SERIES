@@ -81,18 +81,30 @@
 .template-prize-grid small { font-size:.9rem; color:#b8a5cc; }
 .prize-card-line { left:2.3rem; bottom:1.8rem; width:40px; background:#9c6ac6; }
 
-/* Registration guidance. */
+/* Registration guidance (Esports Timeline). */
 .participation-section { position:relative; }
-.participation-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1px solid #ac84df3b; border-bottom:1px solid #ac84df3b; }
-.participation-step { position:relative; padding:2.25rem; border-right:1px solid #ac84df2e; }
-.participation-step:last-child { border-right:0; }
-.participation-number { display:block; color:#af7ff2; font-family:var(--font-display); font-size:2.25rem; font-weight:700; line-height:1; }
-.participation-step h3 { margin:1.5rem 0 .9rem; font-family:var(--font-display); font-size:clamp(1.05rem,1.45vw,1.65rem); font-weight:600; letter-spacing:-.03em; }
-.participation-step>p { max-width:52ch; margin:0 0 1.5rem; color:#a99bb9; font-size:.95rem; line-height:1.85; }
-.participation-detail { color:#8b759f; font-size:.62rem; line-height:1.7; letter-spacing:.07em; }
-.participation-action { display:inline-flex; align-items:center; justify-content:center; gap:2rem; margin-top:1.75rem; border:1px solid #ad7bef77; padding:1rem 1.4rem; background:#241237; color:#e7d7fb; font-family:var(--font-display); font-size:.8rem; cursor:pointer; transition:background 180ms ease,transform 180ms ease; }
-.participation-action:hover { background:#37204f; transform:translateY(-2px); }
-.participation-action>span { font-size:1.3rem; }
+.participation-header { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:1.5rem; margin-bottom:2.25rem; padding-bottom:1.5rem; border-bottom:1px solid #a274d122; }
+.participation-header-copy .section-eyebrow { display:block; color:#ba94e6; font-family:var(--font-display); font-size:.76rem; letter-spacing:.12em; margin-bottom:.35rem; }
+.participation-header-copy h2 { margin:0; font-family:var(--font-display); font-size:clamp(1.9rem,3.2vw,3.2rem); font-weight:800; line-height:1.1; letter-spacing:-.03em; color:#fff; }
+.participation-header-copy h2 span { color:#c095f8; }
+.participation-header-actions { display:flex; align-items:center; gap:1.5rem; }
+.participation-header-desc { max-width:38ch; margin:0; color:#ab98c2; font-size:.85rem; line-height:1.65; text-align:right; }
+.participation-action { display:inline-flex; align-items:center; justify-content:center; gap:.85rem; padding:.85rem 1.4rem; background:#7c3aed; color:#fff; text-decoration:none; font-family:var(--font-display); font-size:.78rem; font-weight:700; letter-spacing:.06em; clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); cursor:pointer; border:0; transition:background 180ms ease,transform 180ms ease,box-shadow 180ms ease; white-space:nowrap; }
+.participation-action:hover { background:#8c49ee; transform:translateY(-2px); box-shadow:0 0 20px rgba(124,58,237,.5); }
+.participation-action--mobile { display:none; }
+.participation-timeline { position:relative; padding-top:1.25rem; }
+.timeline-connector-line { position:absolute; top:2.85rem; left:16%; right:16%; height:2px; background:linear-gradient(90deg,#7c3aed33 0%,#a855f7 50%,#7c3aed33 100%); z-index:0; box-shadow:0 0 10px rgba(168,85,247,.4); }
+.participation-grid { position:relative; z-index:1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.75rem; border:0; padding:0; margin:0; }
+.participation-step { display:flex; flex-direction:column; align-items:center; text-align:center; padding:0; border:0; }
+.participation-node { width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,#2f144d,#140924); border:2px solid #a855f7; display:flex; align-items:center; justify-content:center; box-shadow:0 0 18px rgba(168,85,247,.5),inset 0 0 10px rgba(168,85,247,.3); margin-bottom:1.25rem; transition:transform 200ms ease; }
+.participation-step:hover .participation-node { transform:scale(1.08); border-color:#c084fc; box-shadow:0 0 24px rgba(192,132,252,.7),inset 0 0 12px rgba(192,132,252,.5); }
+.participation-node span { font-family:var(--font-display); font-size:1.05rem; font-weight:800; color:#f3e8ff; letter-spacing:-.02em; }
+.participation-card { width:100%; min-height:185px; display:flex; flex-direction:column; justify-content:space-between; padding:1.4rem 1.3rem; background:linear-gradient(150deg,#190e29b8,#0f091ab8); border:1px solid #a274d126; border-radius:3px; transition:border-color 200ms ease,background 200ms ease; }
+.participation-step:hover .participation-card { border-color:#a855f766; background:linear-gradient(150deg,#221338cc,#130c22cc); }
+.participation-step-tag { display:block; font-family:var(--font-display); font-size:.62rem; color:#a855f7; letter-spacing:.14em; text-transform:uppercase; margin-bottom:.35rem; }
+.participation-card h3 { margin:0 0 .65rem; font-family:var(--font-display); font-size:clamp(.98rem,1.2vw,1.25rem); font-weight:700; letter-spacing:-.02em; color:#fff; }
+.participation-card p { margin:0 0 1rem; color:#b7a4cd; font-size:.83rem; line-height:1.65; }
+.participation-detail { display:inline-block; align-self:center; font-family:var(--font-display); font-size:.6rem; color:#c084fc; background:#2c114e77; border:1px solid #a855f73d; padding:.2rem .65rem; border-radius:3px; letter-spacing:.08em; }
 
 /* Rules with a contextual side panel. */
 .rules-tabs-wrap { justify-content:flex-start; }
@@ -248,8 +260,8 @@
  .template-hero-v2 { padding-top:7rem; }
  .template-section-title { gap:1rem 2rem; }
  .template-section-title>p { font-size:.9rem; }
- .participation-step { padding:1.5rem; }
- .participation-step>p { font-size:.86rem; }
+ .participation-grid { gap:1.25rem; }
+ .participation-header-desc { max-width:28ch; font-size:.8rem; }
  .footer-main-grid { grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:2rem; }
  .footer-brand-col { grid-column:1/-1; }
  .competition-publication { grid-template-columns:minmax(0,1fr) minmax(0,.6fr); }
@@ -304,13 +316,20 @@
  .template-prize-grid strong { font-size:3.4rem; }
  .template-prize-grid small { font-size:.83rem; }
  .prize-card-line { left:1.8rem; }
- .participation-grid { grid-template-columns:1fr; }
- .participation-step { padding:1.8rem 0; border-right:0; border-bottom:1px solid #ac84df2e; }
- .participation-step:last-child { border-bottom:0; }
- .participation-step h3 { font-size:1.15rem; }
- .participation-number { font-size:2rem; }
- .participation-step>p { font-size:.93rem; }
- .participation-action { width:100%; font-size:.72rem; gap:1rem; }
+ .participation-header { flex-direction:column; align-items:flex-start; gap:1rem; margin-bottom:1.5rem; padding-bottom:1.2rem; }
+ .participation-header-actions { display:none; }
+ .participation-header-desc { text-align:left; max-width:none; font-size:.82rem; }
+ .participation-timeline { padding-top:0; }
+ .timeline-connector-line { top:1rem; bottom:2rem; left:22px; right:auto; width:2px; height:auto; background:linear-gradient(180deg,#a855f7,#7c3aed); }
+ .participation-grid { grid-template-columns:1fr; gap:1.25rem; padding-left:3.25rem; }
+ .participation-step { flex-direction:row; align-items:flex-start; text-align:left; position:relative; }
+ .participation-node { position:absolute; left:-3.25rem; top:.2rem; width:44px; height:44px; margin-bottom:0; }
+ .participation-node span { font-size:.9rem; }
+ .participation-card { min-height:auto; padding:1.15rem; }
+ .participation-card h3 { font-size:1.05rem; }
+ .participation-card p { font-size:.82rem; margin-bottom:.75rem; }
+ .participation-detail { align-self:flex-start; }
+ .participation-action--mobile { display:flex; width:100%; margin-top:1.5rem; font-size:.75rem; }
  .rules-tabs { width:100%; }
  .rules-tab { padding:1rem .5rem; }
  .rules-tab>span { font-size:.63rem; }
