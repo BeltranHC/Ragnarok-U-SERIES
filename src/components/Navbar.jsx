@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useRegistration } from '../context/RegistrationContext'
+import { audio } from '../lib/audioEngine'
 
 const links = [
   { label: 'Inicio', to: '/' },
   { label: 'Reglamento', to: '#reglamento' },
   { label: 'Equipos confirmados', to: '/equipos' },
-  { label: 'Fixture y resultados', to: '/llaves' },
+  { label: 'Llaves del torneo', to: '/llaves' },
+  { label: 'Cronograma', to: '/cronograma' },
 ]
 
 function Navbar() {
@@ -27,19 +29,19 @@ function Navbar() {
 
   const showRegistration = () => {
     closeMenu()
-
+    audio.click()
     openRegistration()
   }
 
   const switchDivision = (gameKey) => {
     setActiveGame(gameKey)
-
+    audio.selectGame(gameKey)
     closeMenu()
   }
 
   const goToRules = () => {
     closeMenu()
-
+    audio.click()
     const el = document.getElementById('reglamento')
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' })
@@ -57,7 +59,13 @@ function Navbar() {
       />
       <nav className="navbar" aria-label="Navegación principal">
         <NavLink to="/" className="brand" onClick={closeMenu}>
-          <img className="brand-mark" src="/images/ragnarok-principal.png" alt="" width="42" height="42" />
+          <img
+            className="brand-logo"
+            src="/images/ragnarok-principal.png"
+            alt="Ragnarok U-Series"
+            width="40"
+            height="40"
+          />
           <div className="brand-copy">
             <span className="brand-title">RAGNAROK <em>:</em> U-SERIES</span>
             <span className="brand-sub">ESPORTS UNIVERSITARIO 2026</span>
@@ -71,7 +79,7 @@ function Navbar() {
           aria-controls="main-navigation"
           aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
           onClick={() => {
-
+            audio.click()
             setIsOpen((open) => !open)
           }}
         >
@@ -92,25 +100,39 @@ function Navbar() {
           ))}
         </div>
 
-        {/* Switcher rápido de disciplina (MLBB / FF) */}
-        <div className="nav-game-switcher" aria-label="Selector de disciplina">
+        {/* Switcher rápido de disciplina (MLBB / FF) con logos oficiales */}
+        <div className="nav-game-switcher" aria-label="Selector de disciplina" role="group">
           <button
             type="button"
             className={`nav-switch-tab ${activeGame === 'mlbb' ? 'nav-switch-tab--active nav-switch-tab--mlbb' : ''}`}
             onClick={() => switchDivision('mlbb')}
             title="Cambiar a División Mobile Legends"
+            aria-label="Mobile Legends: Bang Bang"
+            aria-pressed={activeGame === 'mlbb'}
           >
-            <img src="/img/logomlbb.png" alt="" aria-hidden="true" />
-            <span>MLBB</span>
+            <img
+              src="/images/mobile-legends-logo.png"
+              alt="Mobile Legends"
+              className="nav-switch-logo nav-switch-logo--mlbb"
+              width="96"
+              height="26"
+            />
           </button>
           <button
             type="button"
             className={`nav-switch-tab ${activeGame === 'ff' ? 'nav-switch-tab--active nav-switch-tab--ff' : ''}`}
             onClick={() => switchDivision('ff')}
             title="Cambiar a División Free Fire"
+            aria-label="Free Fire"
+            aria-pressed={activeGame === 'ff'}
           >
-            <img src="/img/logoffcondondo.webp" alt="" aria-hidden="true" />
-            <span>FREE FIRE</span>
+            <img
+              src="/images/free-fire-logo.png"
+              alt="Free Fire"
+              className="nav-switch-logo nav-switch-logo--ff"
+              width="88"
+              height="20"
+            />
           </button>
         </div>
 

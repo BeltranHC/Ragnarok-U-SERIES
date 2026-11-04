@@ -7,11 +7,12 @@ function PagePlaceholder({ title, description, kind = 'teams' }) {
   const game = activeGame === 'ff' ? 'ff' : 'mlbb'
   const isBracket = kind === 'bracket'
   const notFound = kind === 'not-found'
+  const isSchedule = kind === 'schedule'
 
   return (
     <main className="competition-page">
       <header className="competition-heading template-section-title">
-        <span>RAGNAROK / {notFound ? 'RUTA NO DISPONIBLE' : isBracket ? 'FIXTURE Y RESULTADOS' : 'LA COMUNIDAD COMPITE'}</span>
+        <span>RAGNAROK / {notFound ? 'RUTA NO DISPONIBLE' : isSchedule ? 'FECHAS Y HORARIOS' : isBracket ? 'FIXTURE Y RESULTADOS' : 'LA COMUNIDAD COMPITE'}</span>
         <h1>{title}</h1><p>{description}</p>
       </header>
       {!notFound && (
@@ -23,15 +24,15 @@ function PagePlaceholder({ title, description, kind = 'teams' }) {
       <section className="competition-publication" aria-labelledby="publication-title">
         <div className="competition-publication-copy">
           <span className="publication-status"><i />{notFound ? '404 / NO ENCONTRADO' : 'PENDIENTE DE PUBLICACIÓN'}</span>
-          <h2 id="publication-title">{notFound ? 'VUELVE A LA ARENA.' : isBracket ? 'LOS CRUCES SE DEFINEN AQUÍ.' : 'TU ESCUADRA TIENE UN LUGAR.'}</h2>
-          <p>{notFound ? 'Sigue explorando el evento desde la portada.' : isBracket ? 'Cuando la organización publique el fixture, aquí podrás consultar los encuentros y seguir el avance de la competencia.' : 'Este será el espacio de los equipos confirmados por la organización. Mientras se publica el roster, prepara los datos de tu escuadra.'}</p>
+          <h2 id="publication-title">{notFound ? 'VUELVE A LA ARENA.' : isSchedule ? 'EL CRONOGRAMA SE PUBLICARÁ PRONTO.' : isBracket ? 'LOS CRUCES SE DEFINEN AQUÍ.' : 'TU ESCUADRA TIENE UN LUGAR.'}</h2>
+          <p>{notFound ? 'Sigue explorando el evento desde la portada.' : isSchedule ? 'Cuando la organización fije los horarios, aquí verás el día y la hora de cada partido y de los eventos del torneo.' : isBracket ? 'Cuando la organización publique el fixture, aquí podrás consultar los encuentros y seguir el avance de la competencia.' : 'Este será el espacio de los equipos confirmados por la organización. Mientras se publica el roster, prepara los datos de tu escuadra.'}</p>
           <div className="competition-actions">
             {!notFound && <button className="hero-btn-primary clip-corner" type="button" onClick={() => openRegistration(game)}>INSCRIBIR A MI EQUIPO <span aria-hidden="true">↗</span></button>}
             <Link className="competition-home-link" to="/">VOLVER AL INICIO <span aria-hidden="true">→</span></Link>
           </div>
         </div>
         <div className="competition-publication-art" aria-hidden="true">
-          <span className="competition-monogram">{notFound ? '404' : isBracket ? 'VS' : 'TEAM'}</span>
+          <span className="competition-monogram">{notFound ? '404' : isSchedule ? 'HORA' : isBracket ? 'VS' : 'TEAM'}</span>
           <CharacterArt character={game === 'ff' ? 'tiradora' : 'marcel'} className="competition-character" />
         </div>
       </section>

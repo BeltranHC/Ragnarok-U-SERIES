@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import Icon from './Icon'
 import CharacterArt from './CharacterArt'
+import { audio } from '../lib/audioEngine'
 import { useRegistration } from '../context/RegistrationContext'
 import { useTournament } from '../context/TournamentContext'
 import { publicUrl } from '../lib/tournamentApi'
@@ -28,10 +28,10 @@ const RULES_DATA = {
       {
         num: '02',
         title: 'Inscripciones y Requisitos de Escuadra',
-        highlight: '5 titulares obligatorios + hasta 2 suplentes · ID Cuenta + Server ID',
+        highlight: '5 titulares obligatorios + hasta 2 suplentes · ID de jugador',
         points: [
           'Estructura del Equipo: Cada escuadra debe registrar obligatoriamente a 5 jugadores titulares. Opcionalmente, se permite el registro de hasta 2 jugadores suplentes.',
-          'Identificación (IDs): Es obligatorio registrar tanto el ID de Cuenta como el ID de Servidor (los 4 dígitos entre paréntesis) de todos los integrantes.',
+          'Identificación (IDs): Es obligatorio registrar el ID de jugador de todos los integrantes.',
           'El Capitán: Será el único medio de comunicación oficial. Debe proveer su nombre real, número de WhatsApp y su institución (UNAP u otra).',
           'Validación de Pagos (Yape): La inscripción será válida tras verificar el comprobante de pago. En caso de ganar, el pozo de premios será transferido única y exclusivamente a la cuenta del capitán.',
         ],
@@ -150,7 +150,7 @@ function RulesSection() {
   const { activeGame, setActiveGame } = useRegistration()
   const { games, content } = useTournament()
   const [activeTab, setActiveTab] = useState(() => (activeGame === 'ff' || activeGame === 'mlbb') ? activeGame : 'mlbb')
-  const [openIndex, setOpenIndex] = useState(-1)
+  const [openIndex, setOpenIndex] = useState(0)
 
   useEffect(() => {
     if (activeGame === 'ff' || activeGame === 'mlbb') {
@@ -167,7 +167,7 @@ function RulesSection() {
     title: remote?.name || base.title,
     subtitle: remote?.subtitle || base.subtitle,
     badge: remote?.badge || base.badge,
-    scoringTable: remote?.scoring_table?.length ? remote.scoring_table : base.scoringTable,
+    scoringTable: remote?.scoring_table?.length ? remote.scoring_table : content ? [] : base.scoringTable,
     sections: remoteSections?.length
       ? remoteSections.map((section, index) => ({ ...section, num: String(index + 1).padStart(2, '0') }))
       : base.sections,
@@ -178,20 +178,24 @@ function RulesSection() {
   const switchTab = (tab) => {
     setActiveTab(tab)
     setActiveGame(tab)
-    setOpenIndex(-1)
-
+    setOpenIndex(0)
+    audio.selectGame(tab)
   }
 
   const toggleAccordion = (index) => {
     setOpenIndex((prev) => (prev === index ? -1 : index))
+    audio.click()
   }
 
   return (
     <section id="reglamento" className="rules-section" aria-labelledby="rules-title">
       <div className="template-section-title">
         <span>04 / BASES Y NORMATIVA OFICIAL</span>
-        <h2 id="rules-title">Reglas claras. <em>Juego limpio.</em></h2>
-        <p>Consulta los requisitos y las normas de tu disciplina. También puedes descargar las bases completas.</p>
+        <h2 id="rules-title">CONOCE LAS REGLAS.<br /><em>DOMINA LA ARENA.</em></h2>
+        <p>
+          Extraído directamente de las bases aprobadas para RAGNAROK U-Series 2026.
+          Selecciona tu disciplina para revisar las reglas oficiales.
+        </p>
       </div>
 
       {/* Selector de Disciplina */}
@@ -202,7 +206,7 @@ function RulesSection() {
             className={`rules-tab ${activeTab === 'mlbb' ? 'rules-tab--active rules-tab--mlbb' : ''}`}
             onClick={() => switchTab('mlbb')}
           >
-            <span>MOBILE LEGENDS</span>
+            <span>BASES MOBILE LEGENDS</span>
             <small>5V5 DRAFT PICK</small>
           </button>
           <button
@@ -210,7 +214,7 @@ function RulesSection() {
             className={`rules-tab ${activeTab === 'ff' ? 'rules-tab--active rules-tab--ff' : ''}`}
             onClick={() => switchTab('ff')}
           >
-            <span>FREE FIRE</span>
+            <span>BASES FREE FIRE</span>
             <small>BATTLE ROYALE SQUADS</small>
           </button>
         </div>
@@ -267,7 +271,7 @@ function RulesSection() {
                   <h3>{section.title}</h3>
                   <p>{section.highlight}</p>
                 </div>
-                <span className={`rules-chevron ${isOpen ? 'rules-chevron--open' : ''}`}><Icon name="chevron" size={18} /></span>
+                <span className={`rules-chevron ${isOpen ? 'rules-chevron--open' : ''}`}>▼</span>
               </button>
               {isOpen && (
                 <div className="rules-accordion-body">

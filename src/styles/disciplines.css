@@ -1,0 +1,366 @@
+/* ==========================================================================
+   Disciplines Section (01 / Elige tu disciplina - Estilo Ragnarok U-Series)
+   ========================================================================== */
+
+:root {
+  --page-gutter: clamp(16px, 1.8vw, 48px);
+}
+
+.ui-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.disciplines-section {
+  width: calc(100% - var(--page-gutter) * 2);
+  max-width: none;
+  margin: 1.25rem auto 2rem;
+  scroll-margin-top: 6rem;
+  padding: 1.5rem 0 0;
+  border-top: 1px solid rgba(162, 116, 209, 0.18);
+}
+
+.template-section-title {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 0.8rem 2rem;
+  margin-bottom: 1.75rem;
+  align-items: end;
+}
+
+.template-section-title > span {
+  grid-column: 1 / -1;
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #ad78ff;
+  text-transform: uppercase;
+}
+
+.template-section-title h2,
+.template-section-title h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.2vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: #fff;
+}
+
+.template-section-title h2 em {
+  font-style: normal;
+  color: #b79bcf;
+}
+
+.template-section-title > p {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  max-width: 52ch;
+  margin: 0;
+  color: #b9a9cc;
+}
+
+.discipline-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.discipline-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 0;
+  background: #140d1f;
+  border: 1px solid rgba(162, 117, 205, 0.35);
+  border-radius: 4px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.discipline-panel:hover {
+  border-color: rgba(162, 117, 205, 0.75);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(113, 52, 201, 0.25);
+}
+
+.discipline-panel--ff {
+  border-color: rgba(188, 101, 157, 0.35);
+}
+
+.discipline-panel--ff:hover {
+  border-color: rgba(225, 29, 72, 0.75);
+  box-shadow: 0 12px 35px rgba(225, 29, 72, 0.25);
+}
+
+.discipline-panel-background {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+}
+
+.discipline-panel::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, #110b1cf5 15%, #110b1cd9 65%, #110b1c22),
+              linear-gradient(0deg, #110b1c, transparent 60%);
+}
+
+.discipline-panel--ff::before {
+  background: linear-gradient(90deg, #170c1bf5 15%, #170c1bd9 65%, #170c1b22),
+              linear-gradient(0deg, #170c1b, transparent 60%);
+}
+
+.discipline-panel-character {
+  position: absolute;
+  z-index: -1;
+  width: 50%;
+  height: 112%;
+  right: -4%;
+  bottom: -9%;
+  mask-image: linear-gradient(90deg, transparent, #000 30%);
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.discipline-panel--ff .discipline-panel-character {
+  width: 38%;
+  height: 112%;
+  right: -2%;
+  bottom: -10%;
+}
+
+.discipline-panel-character img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.discipline-panel-copy {
+  position: relative;
+  z-index: 1;
+  width: 78%;
+  padding: 1.8rem 2rem;
+}
+
+.discipline-panel-mode {
+  color: #bb91ed;
+  font-size: 0.58rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.discipline-panel--ff .discipline-panel-mode {
+  color: #ef9bce;
+}
+
+.discipline-panel h3 {
+  margin: 0.75rem 0 0.65rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.2vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: #fff;
+}
+
+.discipline-panel h3 small {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #b3a0c5;
+}
+
+.discipline-panel-copy > p {
+  color: #b6a7c4;
+  font-size: 0.86rem;
+  line-height: 1.65;
+  max-width: 42ch;
+  margin: 0 0 1.15rem;
+}
+
+.discipline-facts {
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.discipline-facts li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.74rem;
+  color: #d1c0e0;
+  line-height: 1.5;
+}
+
+.discipline-facts .ui-icon {
+  color: #b88ce9;
+}
+
+.discipline-panel--ff .discipline-facts .ui-icon {
+  color: #ed9acb;
+}
+
+.discipline-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(172, 140, 194, 0.22);
+}
+
+.discipline-panel-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #7331c7;
+  border: 1px solid #ae78e9;
+  padding: 0.75rem 1.15rem;
+  min-height: 44px;
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.discipline-panel-actions button:hover {
+  background: #8c44df;
+  transform: translateY(-2px);
+}
+
+.discipline-panel--ff .discipline-panel-actions button {
+  background: #8b285f;
+  border-color: #c766a2;
+}
+
+.discipline-panel--ff .discipline-panel-actions button:hover {
+  background: #a33472;
+}
+
+.discipline-panel-actions > strong {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  white-space: nowrap;
+  color: #fff;
+  line-height: 1;
+}
+
+.discipline-panel-actions > strong small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.46rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #b3a2c4;
+  margin-top: 0.3rem;
+}
+
+.discipline-rules-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: #c5b4d6;
+  font-size: 0.72rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.discipline-rules-link:hover {
+  color: #fff;
+}
+
+.competition-shortcuts {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  padding: 1.25rem 0 0;
+}
+
+.competition-shortcuts > span {
+  margin-right: auto;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: #9180a1;
+  font-family: var(--font-display);
+}
+
+.competition-shortcuts > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #c6afd9;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.competition-shortcuts > a:hover {
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .discipline-panel-copy { width: 85%; padding: 1.4rem; }
+  .discipline-panel h3 { font-size: 1.65rem; }
+  .discipline-facts li { font-size: 0.68rem; }
+  .discipline-panel-actions { gap: 0.9rem; }
+  .discipline-panel-actions button { font-size: 0.58rem; padding-inline: 0.8rem; }
+}
+
+@media (max-width: 900px) {
+  .disciplines-section { margin-top: 2rem; width: calc(100% - 1.5rem); padding: 0; }
+  .template-section-title { grid-template-columns: 1fr; gap: 0.7rem; margin-bottom: 1.35rem; }
+  .template-section-title h2 { font-size: clamp(1.65rem, 6.5vw, 2.6rem); }
+  .template-section-title > span { font-size: 0.6rem; }
+  .template-section-title > p { font-size: 0.86rem; line-height: 1.65; }
+  .discipline-grid { grid-template-columns: 1fr; gap: 1.15rem; }
+  .discipline-panel-copy { width: 85%; padding: 1.4rem; }
+  .discipline-panel h3 { font-size: 1.85rem; }
+  .discipline-panel-copy > p { font-size: 0.83rem; }
+  .discipline-facts li { font-size: 0.72rem; }
+  .discipline-panel-actions button { font-size: 0.6rem; }
+  .discipline-panel-character { width: 55%; right: -9%; }
+  .discipline-panel--ff .discipline-panel-character { width: 43%; right: -6%; }
+  .competition-shortcuts { flex-wrap: wrap; justify-content: flex-start; gap: 0.8rem 1rem; }
+  .competition-shortcuts > span { flex-basis: 100%; font-size: 0.52rem; }
+  .competition-shortcuts > a { font-size: 0.7rem; }
+}
+
+@media (max-width: 600px) {
+  .discipline-panel-copy { width: 92%; padding: 1.2rem; }
+  .discipline-panel-mode { font-size: 0.5rem; }
+  .discipline-panel h3 { font-size: 1.55rem; }
+  .discipline-panel-actions { gap: 0.8rem; flex-wrap: wrap; }
+  .discipline-panel-actions button { font-size: 0.58rem; padding-inline: 0.75rem; gap: 0.5rem; }
+  .discipline-panel-actions > strong { font-size: 1.4rem; }
+}

@@ -1,32 +1,24 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
+import { audio } from '../lib/audioEngine'
 
 function RegistrationModal({ children, onClose, open }) {
-  const dialogRef = useRef(null)
-  const closeRef = useRef(onClose)
-  useEffect(() => { closeRef.current = onClose }, [onClose])
   useEffect(() => {
     if (!open) return
-    const previousFocus = document.activeElement
-    const previousOverflow = document.body.style.overflow
-    const focusable = () => [...dialogRef.current.querySelectorAll('button, input, select, textarea, a[href]')].filter(element => !element.matches(':disabled') && element.getClientRects().length)
-    focusable()[0]?.focus({ preventScroll: true })
-    const handleKeyDown = event => {
-      if (event.key === 'Escape') { event.preventDefault(); closeRef.current(); return }
-      if (event.key !== 'Tab') return
-      const elements = focusable()
-      const first = elements[0], last = elements[elements.length - 1]
-      if (!first) { event.preventDefault(); return }
-      if (event.shiftKey && (document.activeElement === first || !dialogRef.current.contains(document.activeElement))) { event.preventDefault(); last.focus() }
-      else if (!event.shiftKey && (document.activeElement === last || !dialogRef.current.contains(document.activeElement))) { event.preventDefault(); first.focus() }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
     }
+
     window.addEventListener('keydown', handleKeyDown)
     document.body.style.overflow = 'hidden'
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = previousOverflow
-      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true })
+      document.body.style.overflow = ''
     }
-  }, [open])
+  }, [open, onClose])
 
   if (!open) return null
 
@@ -38,7 +30,6 @@ function RegistrationModal({ children, onClose, open }) {
     >
       <section
         className="registration-modal anim-modal clip-corner"
-        ref={dialogRef}
         aria-modal="true"
         role="dialog"
         aria-label="Inscripción de equipo"
@@ -47,7 +38,10 @@ function RegistrationModal({ children, onClose, open }) {
         <div className="registration-modal-stripe" />
         <button
           className="registration-modal-close"
-          onClick={onClose}
+          onClick={() => {
+            audio.click()
+            onClose()
+          }}
           type="button"
           aria-label="Cerrar inscripción"
         >

@@ -1,22 +1,39 @@
 import { createClient } from '@supabase/supabase-js'
 
-const env = import.meta.env || {}
-const url = env.VITE_SUPABASE_URL?.trim()
-const key = (env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY)?.trim()
-const validUrl = (() => {
-  try { return ['https:', 'http:'].includes(new URL(url).protocol) && !url.includes('tu_url') } catch { return false }
-})()
-// Fail closed: a missing project never sends personal information to a placeholder host.
-const privilegedKey = (() => {
-  if (key?.startsWith('sb_secret_')) return true
-  try { return JSON.parse(atob(key.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).role === 'service_role' } catch { return false }
-})()
-export const isSupabaseConfigured = Boolean(validUrl && key && !key.startsWith('tu_') && !privilegedKey)
-export const supabase = isSupabaseConfigured ? createClient(url, key) : null
-export function requireSupabase() {
-  if (!supabase) throw new Error('Las inscripciones todavía no están habilitadas. Inténtalo más tarde.')
-  return supabase
+const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim()
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '').trim()
+
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+
+if (!isSupabaseConfigured) {
+  console.warn(
+    'Supabase no está configurado. Añade VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY (o VITE_SUPABASE_PUBLISHABLE_KEY) a tu archivo .env.',
+  )
 }
 
-// Separate storage prevents an organizer login from replacing a captain's session.
-export const adminSupabase = isSupabaseConfigured ? createClient(url, key, { auth: { storageKey: 'ragnarok-admin-auth' } }) : null
+// Una clave service_role en el navegador daría acceso total a la base: se rechaza siempre.
+function assertNotServiceRole(key) {
+  try {
+    const parts = key.split('.')
+    if (parts.length >= 2) {
+      const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+      if (payload.role === 'service_role') {
+        throw new Error('VITE_SUPABASE_ANON_KEY contiene una clave service_role. Usa solo la clave pública (anon/publishable).')
+      }
+    }
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('VITE_SUPABASE_ANON_KEY')) throw err
+  }
+}
+
+if (supabaseAnonKey?.startsWith('sb_secret_')) {
+  throw new Error('VITE_SUPABASE_ANON_KEY contiene una clave secreta. Usa solo la clave pública (publishable).')
+}
+if (supabaseAnonKey) assertNotServiceRole(supabaseAnonKey)
+
+// El sitio público no inicia sesión: no se guarda ni se refresca ninguna sesión.
+export const supabase = createClient(
+  isSupabaseConfigured ? supabaseUrl : 'https://placeholder.supabase.co',
+  isSupabaseConfigured ? supabaseAnonKey : 'placeholder-anon-key',
+  { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } },
+)

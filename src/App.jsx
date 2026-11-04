@@ -1,77 +1,115 @@
-import { lazy, Suspense, useState } from 'react'
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
-import SplashScreen from './components/SplashScreen'
 import RouteScroll from './components/RouteScroll'
+import AudioControls from './components/AudioControls'
 import ParticleBackground from './components/ParticleBackground'
 import RegistrationModal from './components/RegistrationModal'
+import SplashScreen from './components/SplashScreen'
 import Footer from './components/Footer'
+import LiveDock from './components/LiveDock'
 import { RegistrationProvider, useRegistration } from './context/RegistrationContext'
+import { audio } from './lib/audioEngine'
 import Home from './pages/Home'
 import Inscription from './pages/Inscription'
 import PagePlaceholder from './pages/PagePlaceholder'
-import Competition from './pages/Competition'
 import Teams from './pages/Teams'
 import Bracket from './pages/Bracket'
+import Schedule from './pages/Schedule'
 import { TournamentProvider, useTournament } from './context/TournamentContext'
-const Admin = lazy(() => import('./pages/Admin'))
+import { publicUrl } from './lib/tournamentApi'
 import './App.css'
 import './styles/arena.css'
 import './styles/entry.css'
 import './styles/content.css'
 import './styles/hero-carousel.css'
 import './styles/public-data.css'
-import './styles/backend.css'
-import './styles/layout.css'
+import './styles/success.css'
+import './styles/teams.css'
+import './styles/schedule.css'
+import './styles/disciplines.css'
 
 function AppContent() {
-  return <BrowserRouter><AppFrame /></BrowserRouter>
-}
-
-function AppFrame() {
   const [showSplash, setShowSplash] = useState(true)
-  const { closeRegistration, isRegistrationOpen } = useRegistration()
-  const { fromServer } = useTournament()
-  const location = useLocation()
-  const isAdminRoute = location.pathname === '/admin'
+  const [audioStarted, setAudioStarted] = useState(false)
+  const { closeRegistration, isRegistrationOpen, activeGame } = useRegistration()
+  const { games } = useTournament()
+  const mlbbMusic = games.mlbb.music_path
+  const ffMusic = games.ff.music_path
+
+  // Música de fondo: Warsongs Piercing Light.mp3 de la carpeta public.
+  useEffect(() => {
+    let active = true
+    const warsongsTrack = encodeURI('/audio/Warsongs Piercing Light.mp3')
+    const resolve = async (path, fallback) => {
+      const remote = publicUrl('public-assets', path)
+      if (remote) return remote
+      try {
+        const res = await fetch(fallback, { method: 'HEAD' })
+        return res.ok && (res.headers.get('content-type') || '').startsWith('audio') ? fallback : null
+      } catch {
+        return null
+      }
+    }
+    Promise.all([
+      resolve(mlbbMusic, warsongsTrack),
+      resolve(ffMusic, warsongsTrack),
+    ]).then(([mlbb, ff]) => {
+      if (active) audio.setTracks({ mlbb: mlbb || warsongsTrack, ff: ff || warsongsTrack })
+    })
+    return () => {
+      active = false
+    }
+  }, [mlbbMusic, ffMusic])
+
+  // El tema cambia con el juego elegido (sin elegir, suena el de Mobile Legends).
+  useEffect(() => {
+    audio.playMusic(activeGame === 'ff' ? 'ff' : 'mlbb')
+  }, [activeGame])
+
   const enterArena = () => {
+    audio.start()
+    audio.arenaEnter()
+    setAudioStarted(true)
     window.setTimeout(() => setShowSplash(false), 1050)
   }
 
   return (
-    <>
+    <BrowserRouter>
       <RouteScroll />
       <div className="app-shell">
         <div className="site-background" aria-hidden="true">
           <div className="site-grid" />
           <div className="scanline" />
         </div>
-        {!isAdminRoute && <ParticleBackground />}
-        {!isAdminRoute && showSplash && <SplashScreen onEnter={enterArena} />}
-        {!isAdminRoute && <Navbar />}
+        <ParticleBackground />
+        {showSplash && <SplashScreen onEnter={enterArena} />}
+        <Navbar />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home heroEnabled={!showSplash} />} />
           <Route path="/inscripcion" element={<Inscription />} />
-          <Route path="/equipos" element={fromServer ? <Teams /> : <Competition kind="teams" />} />
-          <Route path="/llaves" element={fromServer ? <Bracket /> : <Competition kind="bracket" />} />
-          <Route path="/admin" element={<Suspense fallback={<main className="competition-page" role="status">Cargando panel…</main>}><Admin /></Suspense>} />
+          <Route path="/equipos" element={<Teams />} />
+          <Route path="/llaves" element={<Bracket />} />
+          <Route path="/cronograma" element={<Schedule />} />
           <Route path="*" element={<PagePlaceholder title="Página no encontrada" description="La ruta que buscas no existe en U-Series." kind="not-found" />} />
         </Routes>
-        {!isAdminRoute && <Footer />}
-        {!isAdminRoute && <RegistrationModal onClose={closeRegistration} open={isRegistrationOpen}>
-            <Inscription modal />
-          </RegistrationModal>}
+        <Footer />
+        {audioStarted && <AudioControls />}
+        {!showSplash && <LiveDock />}
+        <RegistrationModal onClose={closeRegistration} open={isRegistrationOpen}>
+          <Inscription modal />
+        </RegistrationModal>
       </div>
-    </>
+    </BrowserRouter>
   )
 }
 
 function App() {
   return (
     <TournamentProvider>
-    <RegistrationProvider>
-      <AppContent />
-    </RegistrationProvider>
+      <RegistrationProvider>
+        <AppContent />
+      </RegistrationProvider>
     </TournamentProvider>
   )
 }

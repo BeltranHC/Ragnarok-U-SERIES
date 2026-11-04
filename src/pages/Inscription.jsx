@@ -1,20 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { submitForBackend } from '../lib/registrationGateway'
-import { useTournament } from '../context/TournamentContext'
-import { formatSoles } from '../lib/money'
-import { publicUrl } from '../lib/tournamentApi'
-import SearchSelect from '../components/SearchSelect'
-import { institutionGroups, OTHER_INSTITUTION } from '../lib/institutions'
-import { careerGroups, OTHER_CAREER } from '../lib/careers'
-import { validateTeam, validateRoster, validateUpload } from '../lib/registrationValidation'
-import { isSupabaseConfigured } from '../supabaseClient'
-import Turnstile from '../components/Turnstile'
-import Icon from '../components/Icon'
-import YapePayment from '../components/YapePayment'
+import { useEffect, useMemo, useState } from 'react'
+import { audio } from '../lib/audioEngine'
 import CharacterArt from '../components/CharacterArt'
 import { useRegistration } from '../context/RegistrationContext'
 import ragnarokCrest from '../assets/ragnarok-crest.svg'
+import { useTournament } from '../context/TournamentContext'
+import { formatSoles } from '../lib/money'
+import { publicUrl, submitRegistration, validateUpload } from '../lib/tournamentApi'
+import SearchSelect from '../components/SearchSelect'
+import RegistrationSuccess from '../components/RegistrationSuccess'
+import { communityLink } from '../lib/whatsapp'
+import { institutionGroups, OTHER_INSTITUTION } from '../lib/institutions'
+import { careerGroups, OTHER_CAREER } from '../lib/careers'
 
 const baseGames = {
   mlbb: {
@@ -25,18 +21,7 @@ const baseGames = {
     pdfUrl: '/docs/Bases_MOBA.pdf',
     pdfName: 'Bases_MOBA.pdf',
     accent: '#b48aff',
-    price: 20,
-    priceFormatted: 'S/ 20.00',
-    detail: 'Capitán + 4 titulares · Hasta 2 suplentes',
-    slots: [
-      { label: 'CAPITÁN', required: true },
-      { label: 'TITULAR 02', required: true },
-      { label: 'TITULAR 03', required: true },
-      { label: 'TITULAR 04', required: true },
-      { label: 'TITULAR 05', required: true },
-      { label: 'SUPLENTE 01', required: false },
-      { label: 'SUPLENTE 02', required: false },
-    ],
+    feeNote: 'Tarifa oficial MOBA',
   },
   ff: {
     name: 'Free Fire',
@@ -46,23 +31,17 @@ const baseGames = {
     pdfUrl: '/docs/Bases_FF.pdf',
     pdfName: 'Bases_FF.pdf',
     accent: '#ef54a6',
-    price: 15,
-    priceFormatted: 'S/ 15.00',
-    detail: 'Capitán + 3 titulares · 1 suplente opcional',
-    slots: [
-      { label: 'CAPITÁN', required: true },
-      { label: 'TITULAR 02', required: true },
-      { label: 'TITULAR 03', required: true },
-      { label: 'TITULAR 04', required: true },
-      { label: 'SUPLENTE', required: false },
-    ],
+    feeNote: 'Tarifa oficial Battle Royale',
   },
 }
-function resolveWhatsappGroup(raw) {
-  try {
-    const url = new URL(raw)
-    return url.protocol === 'https:' && url.hostname === 'chat.whatsapp.com' && url.pathname.length > 1 ? url.href : ''
-  } catch { return '' }
+
+const MAX_SLOTS = 15
+
+function buildSlots(starters, substitutes) {
+  const slots = []
+  for (let i = 0; i < starters; i++) slots.push({ label: i === 0 ? 'CAPITÁN' : `TITULAR 0${i + 1}`, required: true })
+  for (let i = 0; i < substitutes; i++) slots.push({ label: substitutes === 1 ? 'SUPLENTE' : `SUPLENTE 0${i + 1}`, required: false })
+  return slots
 }
 
 const professionalSchoolGroups = [
@@ -128,8 +107,6 @@ const professionalSchoolGroups = [
   },
 ]
 
-const professionalSchools = professionalSchoolGroups.flatMap((group) => group.schools)
-
 const STEPS = [
   { num: 1, label: 'Torneo y Equipo', short: 'Equipo' },
   { num: 2, label: 'Roster Oficial', short: 'Roster' },
@@ -137,9 +114,9 @@ const STEPS = [
 ]
 
 function Inscription({ modal = false }) {
-  const { registrationGame, setActiveGame, closeRegistration, setRegistrationSubmitting } = useRegistration()
-  const { games: gameConfig, settings, deadline, availability, fromServer, loading } = useTournament()
-  const whatsappGroup = resolveWhatsappGroup(settings.whatsapp_group_url || import.meta.env.VITE_WHATSAPP_GROUP_URL?.trim() || '')
+  const { registrationGame, setActiveGame, closeRegistration } = useRegistration()
+  const { games: gameConfig, settings, deadline, availability } = useTournament()
+  const [openedAt] = useState(() => Date.now())
   const [step, setStep] = useState(1)
   const [game, setGame] = useState(() => registrationGame || 'mlbb')
 
@@ -152,11 +129,10 @@ function Inscription({ modal = false }) {
   const [professionalSchool, setProfessionalSchool] = useState('')
   const [customInstitution, setCustomInstitution] = useState('')
   const [customCareer, setCustomCareer] = useState('')
-  const [honeypot, setHoneypot] = useState('')
 
   // Datos Etapa 2 (Roster)
   const [players, setPlayers] = useState(() =>
-    Array.from({ length: 15 }, () => ({ nickname: '', id: '', server: '' }))
+    Array.from({ length: MAX_SLOTS }, () => ({ nickname: '', id: '' }))
   )
 
   // Datos Etapa 3
@@ -164,23 +140,10 @@ function Inscription({ modal = false }) {
   const [termsAccepted, setTermsAccepted] = useState(false)
 
   const [stepError, setStepError] = useState(null)
-  const [notice, setNotice] = useState(null)
   const [submitting, setSubmitting] = useState(false)
-  const [confirmation, setConfirmation] = useState(null)
-  const [captchaToken, setCaptchaToken] = useState('')
-  const requestId = useRef(crypto.randomUUID())
-  const submitLock = useRef(false)
-  const institution = institutionChoice === 'UNAP' ? 'UNAP' : 'Otra'
-  const otherInstitution = [OTHER_INSTITUTION, 'Otra'].includes(institutionChoice) ? customInstitution : institutionChoice
-  const career = professionalSchool === OTHER_CAREER ? customCareer.trim() : professionalSchool
-  const changeInstitution = next => {
-    if ((next === 'UNAP') !== (institutionChoice === 'UNAP')) { setProfessionalSchool(''); setCustomCareer('') }
-    setInstitutionChoice(next)
-  }
-  const schoolGroups = useMemo(() => professionalSchoolGroups.map(group => ({ group: group.area, items: group.schools.map(name => ({ value: name, label: name })) })), [])
-  const formData = { game, teamName, teamLogo, captainName, captainWhatsapp, institution, professionalSchool: career, otherInstitution, players, paymentReceipt, termsAccepted, honeypot }
-
-
+  const [submitted, setSubmitted] = useState(false)
+  const [honeypot, setHoneypot] = useState('')
+  const [notice, setNotice] = useState(null)
 
   useEffect(() => {
     if (registrationGame && (registrationGame === 'ff' || registrationGame === 'mlbb')) {
@@ -190,25 +153,48 @@ function Inscription({ modal = false }) {
 
   const games = useMemo(() => Object.fromEntries(Object.entries(baseGames).map(([key, base]) => {
     const cfg = gameConfig[key]
-    const starters = fromServer ? cfg.starters : base.slots.filter(slot => slot.required).length
-    const substitutes = fromServer ? cfg.substitutes : base.slots.length - starters
-    return [key, { ...base, name: cfg.name || base.name, modeBadge: cfg.badge || base.modeBadge,
-      price: cfg.price, priceFormatted: formatSoles(cfg.price, 2),
-      slots: Array.from({ length: starters + substitutes }, (_, index) => ({ label: index === 0 ? 'CAPITÁN' : index < starters ? `TITULAR ${String(index + 1).padStart(2, '0')}` : `SUPLENTE ${index - starters + 1}`, required: index < starters })),
-      detail: `${starters} titulares + ${substitutes} suplente(s)`,
+    const slots = buildSlots(cfg.starters, cfg.substitutes)
+    return [key, {
+      ...base,
+      name: cfg.name || base.name,
+      modeBadge: cfg.badge || base.modeBadge,
+      slots,
+      price: cfg.price,
+      priceFormatted: formatSoles(cfg.price, 2),
+      isOpen: cfg.is_open,
+      detail: `Capitán + ${cfg.starters - 1} titulares · ${cfg.substitutes ? `Hasta ${cfg.substitutes} suplente${cfg.substitutes > 1 ? 's' : ''}` : 'Sin suplentes'}`,
       pdfUrl: publicUrl('public-assets', cfg.rules_pdf_path) || base.pdfUrl,
     }]
-  })), [gameConfig, fromServer])
-  const slotInfo = availability?.[game]
-  const soldOut = Boolean(fromServer && slotInfo && slotInfo.taken >= slotInfo.max)
-  const registrationClosed = fromServer && (!settings.registration_open || !gameConfig[game].is_open || Date.now() > deadline || soldOut)
+  })), [gameConfig])
+
+  // UNAP se guarda como institución propia (con escuela); cualquier otra, por nombre.
+  const institution = institutionChoice === 'UNAP' ? 'UNAP' : 'Otra'
+  const otherInstitution = institutionChoice === OTHER_INSTITUTION ? customInstitution : institutionChoice
+  // La carrera se pide siempre: escuelas de la UNAP o una lista general para otras instituciones.
+  const career = professionalSchool === OTHER_CAREER ? customCareer.trim() : professionalSchool
+  const changeInstitution = (next) => {
+    if ((next === 'UNAP') !== (institutionChoice === 'UNAP')) {
+      setProfessionalSchool('')
+      setCustomCareer('')
+    }
+    setInstitutionChoice(next)
+  }
+  const schoolGroups = useMemo(() => [
+    ...professionalSchoolGroups.map((g) => ({ group: `Área de ${g.area}`, items: g.schools.map((name) => ({ value: name, label: name })) })),
+    { group: 'Otra', items: [{ value: 'Otra escuela profesional', label: 'Otra escuela profesional / Facultad' }] },
+  ], [])
+
   const gameInfo = games[game]
-  const playerSlots = useMemo(() => gameInfo.slots, [gameInfo])
+  const playerSlots = gameInfo.slots
+  const qrUrl = publicUrl('public-assets', settings.yape_qr_path)
+  const slotInfo = availability?.[game]
+  const soldOut = Boolean(slotInfo && slotInfo.taken >= slotInfo.max)
+  const registrationClosed = !settings.registration_open || openedAt > deadline || !gameInfo.isOpen || soldOut
 
   const changeGame = (nextGame) => {
     setGame(nextGame)
     setActiveGame(nextGame)
-
+    audio.selectGame(nextGame)
     setStepError(null)
   }
 
@@ -220,25 +206,92 @@ function Inscription({ modal = false }) {
     })
   }
 
-  const validate = (error) => {
-    setStepError(error)
-
-    return !error
+  const pickFile = async (event, setter, allowPdf) => {
+    const input = event.target
+    const file = input.files?.[0] || null
+    if (file) {
+      const problem = await validateUpload(file, { allowPdf })
+      if (problem) {
+        setStepError(problem)
+        input.value = ''
+        setter(null)
+        return
+      }
+    }
+    setStepError(null)
+    setter(file)
   }
-  const validateStep1 = () => validate(validateTeam(formData) || (fromServer && !career.trim() ? 'Selecciona o escribe tu carrera profesional.' : null))
-  const validateStep2 = () => validate(validateRoster(game, players, { required: playerSlots.filter(slot => slot.required).length, max: playerSlots.length }))
-  const validateStep3 = () => validate(validateUpload(paymentReceipt, true) || (!termsAccepted ? 'Debes aceptar el reglamento oficial.' : null))
+
+  // Validaciones por etapa
+  const validateStep1 = () => {
+    if (!teamName.trim() || teamName.trim().length < 3) {
+      setStepError('Ingresa un nombre de equipo válido (mínimo 3 caracteres).')
+      audio.click()
+      return false
+    }
+    if (!captainName.trim()) {
+      setStepError('Ingresa los nombres y apellidos del capitán.')
+      audio.click()
+      return false
+    }
+    if (!captainWhatsapp.trim() || captainWhatsapp.replace(/\D/g, '').length < 8) {
+      setStepError('Ingresa un número de WhatsApp válido del capitán (mínimo 9 dígitos).')
+      audio.click()
+      return false
+    }
+    if (!career) {
+      setStepError(institution === 'UNAP' ? 'Selecciona tu escuela profesional de la UNAP.' : 'Selecciona o escribe tu carrera profesional.')
+      audio.click()
+      return false
+    }
+    if (institution === 'Otra' && !otherInstitution.trim()) {
+      setStepError('Ingresa el nombre de tu universidad o institución.')
+      audio.click()
+      return false
+    }
+    setStepError(null)
+    return true
+  }
+
+  const validateStep2 = () => {
+    const requiredSlots = gameInfo.slots.filter((s) => s.required)
+    for (let i = 0; i < requiredSlots.length; i++) {
+      const p = players[i] || {}
+      if (!p.nickname?.trim() || !p.id?.trim()) {
+        setStepError(`Completa el Nickname e ID del ${requiredSlots[i].label}.`)
+        audio.click()
+        return false
+      }
+    }
+    setStepError(null)
+    return true
+  }
+
+  const validateStep3 = () => {
+    if (!paymentReceipt) {
+      setStepError('Sube la captura del comprobante de pago de Yape.')
+      audio.click()
+      return false
+    }
+    if (!termsAccepted) {
+      setStepError('Debes aceptar el reglamento oficial para continuar.')
+      audio.click()
+      return false
+    }
+    setStepError(null)
+    return true
+  }
 
   const nextStep = () => {
     if (step === 1) {
       if (validateStep1()) {
         setStep(2)
-
+        audio.click()
       }
     } else if (step === 2) {
       if (validateStep2()) {
         setStep(3)
-
+        audio.click()
       }
     }
   }
@@ -246,41 +299,49 @@ function Inscription({ modal = false }) {
   const prevStep = () => {
     setStep((prev) => Math.max(1, prev - 1))
     setStepError(null)
-
+    audio.click()
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    if (loading || registrationClosed || (fromServer && Date.now() > deadline)) { setStepError('Las inscripciones están cerradas o la configuración sigue cargando.'); return }
-    if (submitLock.current || !validateStep1() || !validateStep2() || !validateStep3()) return
-    submitLock.current = true
+    if (submitting || submitted) return
+    if (registrationClosed) {
+      setStepError('Las inscripciones de esta disciplina están cerradas.')
+      return
+    }
+    if (!validateStep1() || !validateStep2() || !validateStep3()) return
+
     setSubmitting(true)
-    setRegistrationSubmitting(true)
     setNotice(null)
     try {
-      const saved = await submitForBackend(formData, requestId.current, captchaToken, { legacy: fromServer, maxPlayers: playerSlots.length })
-      setConfirmation(saved)
-    } catch (error) {
-      setNotice({ type: 'warning', text: error.message })
-      setCaptchaToken('')
+      await submitRegistration({
+        gameKey: game,
+        team: teamName.trim(),
+        captain: captainName.trim(),
+        whatsapp: captainWhatsapp,
+        institution,
+        school: career,
+        otherInstitution: otherInstitution.trim(),
+        players: playerSlots.map((_, i) => ({
+          // Los nicknames pueden llevar símbolos o letras decoradas: se conservan tal cual (solo se limpian espacios).
+          nickname: (players[i]?.nickname || '').normalize('NFC').replace(/\s+/g, ' ').trim(),
+          game_player_id: players[i]?.id || '',
+        })),
+        receipt: paymentReceipt,
+        logo: teamLogo,
+        honeypot,
+      })
+      setSubmitted(true)
+      setNotice({
+        type: 'success',
+        text: '¡Inscripción enviada! La organización verificará tu comprobante y te contactará por WhatsApp.',
+      })
+    } catch (err) {
+      setNotice({ type: 'warning', text: err.message })
     } finally {
-      submitLock.current = false
       setSubmitting(false)
-      setRegistrationSubmitting(false)
     }
   }
-
-  if (confirmation) return (
-    <main className="registration-success" role="status">
-      <span className="section-eyebrow">SOLICITUD GUARDADA</span>
-      <h2>¡TU EQUIPO ESTÁ EN REVISIÓN!</h2>
-      <p>Recibimos los datos y el comprobante de <strong>{confirmation.team_name || teamName}</strong>. La organización verificará el pago antes de confirmar su participación.</p>
-      {confirmation.reference_code && <strong className="registration-reference">{confirmation.reference_code}</strong>}
-      <p>{confirmation.reference_code ? 'Guarda este código para consultar tu inscripción con la organización.' : 'La organización te contactará por WhatsApp para confirmar la inscripción.'}</p>
-      {whatsappGroup && <section className="captain-whatsapp-card"><span className="section-eyebrow">COMUNICACIÓN DEL EQUIPO</span><h3>Este enlace es para el capitán</h3><p>Únete al grupo oficial de capitanes para recibir confirmaciones, horarios, salas e indicaciones de la organización.</p><a href={whatsappGroup} target="_blank" rel="noopener noreferrer" className="backend-button backend-button--primary">UNIRME AL GRUPO DE CAPITANES ↗</a><small>No compartas este enlace fuera del equipo.</small></section>}
-      <Link to="/equipos" onClick={closeRegistration} className="competition-home-link">VER EQUIPOS CONFIRMADOS <Icon name="arrow-right" /></Link>
-    </main>
-  )
 
   return (
     <main className={`registration-page ${modal ? 'registration-page--modal' : ''}`}>
@@ -310,14 +371,14 @@ function Inscription({ modal = false }) {
       </div>
 
       {/* Stepper visual en 3 niveles */}
-      <div className="wizard-stepper">
+      <div className={`wizard-stepper ${submitted ? 'wizard-stepper--hidden' : ''}`}>
         {STEPS.map((s, idx) => {
           const isActive = step === s.num
           const isDone = step > s.num
           return (
             <div key={s.num} className={`stepper-node ${isActive ? 'stepper-node--active' : ''} ${isDone ? 'stepper-node--done' : ''}`}>
               <div className="stepper-circle">
-                {isDone ? <Icon name="check" size={17} /> : s.num}
+                {isDone ? '✓' : s.num}
               </div>
               <div className="stepper-label-wrap">
                 <span className="stepper-stage">ETAPA 0{s.num}</span>
@@ -329,11 +390,14 @@ function Inscription({ modal = false }) {
         })}
       </div>
 
-      <form className="registration-form" onSubmit={handleSubmit}>
-        <fieldset className="registration-fields" disabled={submitting || loading}>
-        <label className="pd-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" value={honeypot} onChange={event => setHoneypot(event.target.value)} /></label>
-        {registrationClosed && <p className="form-notice form-notice--warning" role="status">{soldOut ? 'Se agotaron los cupos de esta disciplina.' : 'Las inscripciones de esta disciplina están cerradas.'}</p>}
-        {!isSupabaseConfigured && <p className="form-notice form-notice--warning" role="status">Las inscripciones todavía no están habilitadas. Puedes preparar tus datos y enviarlos cuando la organización abra el registro.</p>}
+      {submitted ? (
+        <RegistrationSuccess teamName={teamName.trim()} gameName={gameInfo.name} amount={gameInfo.priceFormatted}
+          whatsappGroup={communityLink(settings)} onClose={modal ? closeRegistration : null} />
+      ) : (
+      <form className="registration-form" onSubmit={handleSubmit} autoComplete="off">
+        <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}>
+          <label>No llenar este campo<input tabIndex={-1} autoComplete="off" name="website" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} /></label>
+        </div>
         {/* ================= ETAPA 1: TORNEO Y EQUIPO ================= */}
         {step === 1 && (
           <div className="wizard-stage-content">
@@ -362,6 +426,11 @@ function Inscription({ modal = false }) {
                       <span>Tarifa:</span>
                       <b>{item.priceFormatted}</b>
                     </div>
+                    {availability?.[key] && (
+                      <small className="game-choice-slots">
+                        {availability[key].taken >= availability[key].max ? 'CUPOS AGOTADOS' : `QUEDAN ${availability[key].max - availability[key].taken} CUPOS`}
+                      </small>
+                    )}
                   </span>
                   {game === key && <span className="game-choice-status">SELECCIONADO</span>}
                 </button>
@@ -372,9 +441,9 @@ function Inscription({ modal = false }) {
               <label className="form-field">
                 <span>NOMBRE DEL EQUIPO *</span>
                 <input
-                  maxLength={60}
                   name="teamName"
                   minLength="3"
+                  maxLength="40"
                   placeholder="Ej.: Ragnarok Wolves"
                   value={teamName}
                   onChange={(e) => setTeamName(e.target.value)}
@@ -387,7 +456,7 @@ function Inscription({ modal = false }) {
                   accept="image/png,image/jpeg,image/webp"
                   name="teamLogo"
                   type="file"
-                  onChange={(e) => setTeamLogo(e.target.files?.[0] || null)}
+                  onChange={(e) => pickFile(e, setTeamLogo, false)}
                 />
                 <small>{teamLogo ? `Seleccionado: ${teamLogo.name}` : 'PNG, JPG o WEBP · máx. 5 MB (Opcional)'}</small>
               </label>
@@ -397,8 +466,8 @@ function Inscription({ modal = false }) {
               <label className="form-field">
                 <span>NOMBRES Y APELLIDOS DEL CAPITÁN *</span>
                 <input
-                  maxLength={100}
                   name="captainName"
+                  maxLength="80"
                   placeholder="Nombre completo del capitán"
                   value={captainName}
                   onChange={(e) => setCaptainName(e.target.value)}
@@ -409,7 +478,7 @@ function Inscription({ modal = false }) {
                 <span>WHATSAPP DEL CAPITÁN *</span>
                 <input
                   inputMode="tel"
-                  maxLength={24}
+                  maxLength="20"
                   name="captainWhatsapp"
                   placeholder="999 999 999"
                   value={captainWhatsapp}
@@ -418,7 +487,6 @@ function Inscription({ modal = false }) {
                   type="tel"
                 />
               </label>
-              {fromServer ? <>
               <SearchSelect
                 label="INSTITUCIÓN DE PROCEDENCIA *"
                 groups={institutionGroups}
@@ -452,51 +520,6 @@ function Inscription({ modal = false }) {
                   <input name="customCareer" maxLength="120" placeholder="Escribe el nombre de tu carrera" value={customCareer} onChange={(e) => setCustomCareer(e.target.value)} />
                 </label>
               )}
-              </> : <>
-              <label className="form-field">
-                <span>INSTITUCIÓN DE PROCEDENCIA *</span>
-                <select name="institution" onChange={(e) => changeInstitution(e.target.value)} value={institution}>
-                  <option value="UNAP">UNAP (Universidad Nacional del Altiplano)</option>
-                  <option value="Otra">Otra universidad o institución</option>
-                </select>
-              </label>
-              {institution === 'UNAP' ? (
-                <label className="form-field">
-                  <span>ESCUELA PROFESIONAL (UNAP) *</span>
-                  <select
-                    name="professionalSchool"
-                    value={professionalSchool}
-                    onChange={(e) => setProfessionalSchool(e.target.value)}
-                    required
-                  >
-                    <option value="">Selecciona tu escuela profesional (45 escuelas)</option>
-                    {professionalSchoolGroups.map((group) => (
-                      <optgroup key={group.area} label={`── ÁREA DE ${group.area.toUpperCase()} ──`}>
-                        {group.schools.map((school) => (
-                          <option key={school} value={school}>
-                            {school}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                    <option value="Otra escuela profesional">Otra escuela profesional / Facultad</option>
-                  </select>
-                </label>
-              ) : (
-                <label className="form-field">
-                  <span>NOMBRE DE LA INSTITUCIÓN *</span>
-                  <input
-                    maxLength={120}
-                    name="otherInstitution"
-                    placeholder="Ej.: UANCV, TECSUP, etc."
-                    value={otherInstitution}
-                    onChange={(e) => setCustomInstitution(e.target.value)}
-                    required
-                  />
-                </label>
-              )}
-              </>}
-
             </div>
           </div>
         )}
@@ -508,23 +531,20 @@ function Inscription({ modal = false }) {
               <span className="stage-eyebrow">PASO 2 DE 3</span>
               <h3>ROSTER OFICIAL — {gameInfo.name.toUpperCase()}</h3>
               <p>
-                {game === 'mlbb'
-                  ? 'Registra a tus 5 titulares obligatorios y hasta 2 suplentes opcionales. Es obligatorio el Server ID (los 4 dígitos).'
-                  : 'Registra a tus 4 titulares obligatorios y 1 suplente opcional para las salas Battle Royale.'}
+                {`Registra a tus ${gameInfo.slots.filter((x) => x.required).length} titulares obligatorios${gameInfo.slots.length > gameInfo.slots.filter((x) => x.required).length ? ' y a tus suplentes opcionales' : ''}.`}
               </p>
             </div>
 
             <div className="roster-list">
-              <div className={`roster-table-head ${game === 'mlbb' ? 'roster-table-head--mlbb' : ''}`}>
+              <div className="roster-table-head">
                 <span>ROL</span>
                 <span>NICKNAME EN JUEGO</span>
                 <span>ID DE JUGADOR</span>
-                {game === 'mlbb' && <span>SERVER ID</span>}
               </div>
 
               {playerSlots.map((slot, index) => (
                 <div
-                  className={`roster-row-compact ${slot.required ? '' : 'roster-row-compact--opt'} ${game === 'mlbb' ? 'roster-row-compact--mlbb' : ''}`}
+                  className={`roster-row-compact ${slot.required ? '' : 'roster-row-compact--opt'}`}
                   key={`${game}-${slot.label}`}
                 >
                   <div className="roster-slot-chip">
@@ -535,6 +555,7 @@ function Inscription({ modal = false }) {
                   </div>
                   <input
                     className="compact-input"
+                    maxLength={50}
                     name={`player-${index}-nickname`}
                     placeholder={`Nickname ${slot.required ? '*' : '(opcional)'}`}
                     value={players[index]?.nickname || ''}
@@ -544,23 +565,13 @@ function Inscription({ modal = false }) {
                   <input
                     className="compact-input compact-input--mono"
                     inputMode="numeric"
+                    maxLength={15}
                     name={`player-${index}-id`}
                     placeholder={`ID ${slot.required ? '*' : '(opcional)'}`}
                     value={players[index]?.id || ''}
                     onChange={(e) => updatePlayer(index, 'id', e.target.value.replace(/\D/g, ''))}
                     required={slot.required}
                   />
-                  {game === 'mlbb' && (
-                    <input
-                      className="compact-input compact-input--mono"
-                      inputMode="numeric"
-                      name={`player-${index}-server`}
-                      placeholder={`Server ID ${slot.required ? '*' : '(opcional)'}`}
-                      value={players[index]?.server || ''}
-                      onChange={(e) => updatePlayer(index, 'server', e.target.value.replace(/\D/g, ''))}
-                      required={slot.required}
-                    />
-                  )}
                 </div>
               ))}
             </div>
@@ -590,24 +601,55 @@ function Inscription({ modal = false }) {
               </div>
               <div className="summary-col">
                 <span className="summary-label">INSTITUCIÓN</span>
-                <strong>{institution === 'UNAP' ? professionalSchool || 'UNAP' : otherInstitution || 'Otra'}</strong>
-                <small>Roster: {players.slice(0, gameInfo.slots.length).filter((p) => p.nickname?.trim()).length} jugadores registrados</small>
+                <strong>{institution === 'UNAP' ? career || 'UNAP' : [otherInstitution, career].filter(Boolean).join(' · ') || 'Otra'}</strong>
+                <small>Roster: {players.filter((p) => p.nickname?.trim()).length} jugadores registrados</small>
               </div>
             </div>
 
             <div className="payment-panel">
-              <YapePayment amount={gameInfo.priceFormatted} />
+              <div className="payment-qr-wrap">
+                {qrUrl ? (
+                  <img className="payment-qr-img" src={qrUrl} alt="Código QR de Yape de la organización" style={{ width: '100%', maxWidth: 220, borderRadius: 12 }} />
+                ) : (
+                  <div className="payment-qr-pending">
+                  <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true"><path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5" /><rect x="8" y="8" width="8" height="8" /></svg>
+                  <strong>QR DE YAPE</strong><span>PENDIENTE DE PUBLICACIÓN</span>
+                  </div>
+                )}
+                <span className="yape-tag">PAGO POR YAPE</span>
+              </div>
               <div className="payment-copy">
-                <span className="section-eyebrow">CONFIRMA TU PAGO</span>
-                <h2>ADJUNTA EL COMPROBANTE</h2>
-                <p>Yapea el importe de tu disciplina al número indicado, verifica el nombre del destinatario y sube la captura. La organización revisará el pago antes de confirmar a tu equipo.</p>
+                <div className="payment-price-card">
+                  <div className="price-card-main">
+                    <span className="price-card-label">MONTO TOTAL A ABONAR · {gameInfo.shortName}</span>
+                    <strong className="price-card-amount">{gameInfo.priceFormatted}</strong>
+                  </div>
+                  <span className="price-card-note">
+                    {gameInfo.feeNote} ({gameInfo.slots.filter((x) => x.required).length} titulares
+                    {gameInfo.slots.length > gameInfo.slots.filter((x) => x.required).length ? ` + ${gameInfo.slots.length - gameInfo.slots.filter((x) => x.required).length} suplente(s)` : ''})
+                  </span>
+                </div>
+
+                <h2>REALIZA EL ABONO POR YAPE</h2>
+                <p>
+                  {settings.yape_number
+                    ? <>Yapea a <strong>{settings.yape_number}</strong>{settings.yape_holder ? <> a nombre de <strong>{settings.yape_holder}</strong></> : null}. </>
+                    : 'La organización publicará aquí el código oficial y los datos de pago. '}
+                  La tarifa de esta disciplina es <strong>{gameInfo.priceFormatted}</strong> por equipo.
+                </p>
+                {/^\d{8,15}$/.test(settings.contact_whatsapp || '') && (
+                  <p>
+                    ¿Dudas con el pago? Escribe al{' '}
+                    <a href={`https://wa.me/${settings.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp de la organización ↗</a>.
+                  </p>
+                )}
                 <label className="form-field form-field--file">
                   <span>COMPROBANTE DE PAGO (CAPTURA DE YAPE) *</span>
                   <input
                     accept="image/png,image/jpeg,image/webp,application/pdf"
                     name="paymentReceipt"
                     type="file"
-                    onChange={(e) => setPaymentReceipt(e.target.files?.[0] || null)}
+                    onChange={(e) => pickFile(e, setPaymentReceipt, true)}
                     required
                   />
                   <small>
@@ -634,7 +676,7 @@ function Inscription({ modal = false }) {
                     rel="noopener noreferrer"
                     className="terms-rule-link"
                   >
-                    Reglamento Oficial {gameInfo.name} (Descargar PDF)
+                    Reglamento Oficial {gameInfo.name} (Descargar PDF ↗)
                   </a>.
                 </span>
               </label>
@@ -642,16 +684,18 @@ function Inscription({ modal = false }) {
           </div>
         )}
 
-        {step === 3 && <Turnstile token={captchaToken} onToken={setCaptchaToken} />}
         {/* Mensaje de error / validación por etapa */}
-        {stepError && <p className="wizard-step-error" role="alert">{stepError}</p>}
-        {notice && <p role="alert" className={`form-notice form-notice--${notice.type}`}>{notice.text}</p>}
+        {registrationClosed && !submitted && (
+          <p className="wizard-step-error">⚠️ {soldOut ? 'Se agotaron los cupos de esta disciplina.' : 'Las inscripciones de esta disciplina están cerradas.'}</p>
+        )}
+        {stepError && <p className="wizard-step-error">⚠️ {stepError}</p>}
+        {notice && <p className={`form-notice form-notice--${notice.type}`}>{notice.text}</p>}
 
         {/* Barra de navegación de etapas */}
         <div className="wizard-actions">
           {step > 1 ? (
             <button type="button" onClick={prevStep} className="wizard-btn-prev">
-              <Icon name="arrow-left" size={16} /> Atrás
+              ← Atrás
             </button>
           ) : (
             <div />
@@ -659,16 +703,16 @@ function Inscription({ modal = false }) {
 
           {step < 3 ? (
             <button type="button" onClick={nextStep} className="wizard-btn-next">
-              Continuar al {step === 1 ? 'Roster Oficial' : 'Pago'} <Icon name="arrow-right" />
+              Continuar al {step === 1 ? 'Roster Oficial' : 'Pago'} ➔
             </button>
           ) : (
-            <button className="registration-submit" type="submit" disabled={submitting || loading || registrationClosed || !isSupabaseConfigured} aria-busy={submitting}>
-              {submitting ? 'GUARDANDO INSCRIPCIÓN…' : `ENVIAR INSCRIPCIÓN (${gameInfo.priceFormatted})`} <Icon name="arrow-up-right" />
+            <button className="registration-submit" type="submit" disabled={submitting || submitted || registrationClosed}>
+              {submitting ? 'ENVIANDO…' : submitted ? 'INSCRIPCIÓN ENVIADA' : registrationClosed ? (soldOut ? 'CUPOS AGOTADOS' : 'INSCRIPCIONES CERRADAS') : `ENVIAR INSCRIPCIÓN (${gameInfo.priceFormatted})`} <span>↗</span>
             </button>
           )}
         </div>
-        </fieldset>
       </form>
+      )}
     </main>
   )
 }

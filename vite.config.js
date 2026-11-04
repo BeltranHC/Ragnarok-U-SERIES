@@ -11,13 +11,13 @@ const projectKey = createHash('sha256').update(projectRoot).digest('hex').slice(
 // CSP estricta solo en el build (en desarrollo Vite necesita scripts inline para HMR).
 const csp = [
   "default-src 'self'",
-  "script-src 'self' https://challenges.cloudflare.com",
+  "script-src 'self'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https://*.supabase.co",
   "media-src 'self' blob: https://*.supabase.co",
-  "connect-src 'self' https://challenges.cloudflare.com https://*.supabase.co wss://*.supabase.co",
-  "frame-src https://challenges.cloudflare.com; object-src 'none'",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+  "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
 ].join('; ')
@@ -32,6 +32,10 @@ export default defineConfig({
   plugins: [react(), injectCsp],
   // Keep dependency caches outside Dropbox and separate for each checkout.
   cacheDir: join(tmpdir(), 'esports-tournament-manager', projectKey, 'vite'),
+  build: {
+    // Evita EPERM de rmSync en Windows cuando Dropbox u otros procesos bloquean dist/
+    emptyOutDir: false,
+  },
   server: {
     watch: {
       // Git ignores do not prevent Vite from watching local QA/browser files.

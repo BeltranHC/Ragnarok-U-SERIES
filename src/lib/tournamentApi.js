@@ -1,18 +1,18 @@
-import { isSupabaseConfigured, supabase } from '../supabaseClient.js'
+import { isSupabaseConfigured, supabase } from '../supabaseClient'
 
 // Valores actuales del sitio: se usan si Supabase no responde o no está configurado.
 export const FALLBACK_CONFIG = {
   settings: {
     registration_open: true,
-    registration_deadline: '2026-12-15T23:59:59-05:00',
+    registration_deadline: '2026-11-21T23:59:59-05:00',
     yape_number: '',
     yape_holder: '',
     yape_qr_path: null,
     contact_whatsapp: '',
   },
   games: {
-    mlbb: { key: 'mlbb', price: 20, max_teams: 32, starters: 5, substitutes: 2, is_open: true, rules_pdf_path: null },
-    ff: { key: 'ff', price: 15, max_teams: 24, starters: 4, substitutes: 1, is_open: true, rules_pdf_path: null },
+    mlbb: { key: 'mlbb', price: 20, max_teams: 32, starters: 5, substitutes: 2, is_open: true, rules_pdf_path: null, live: false, live_links: [] },
+    ff: { key: 'ff', price: 15, max_teams: 24, starters: 4, substitutes: 1, is_open: true, rules_pdf_path: null, live: false, live_links: [] },
   },
   prizes: [
     { place: 1, label: 'CAMPEÓN', amount: 1500, description: 'Trofeo y reconocimiento oficial' },
@@ -109,11 +109,33 @@ export async function fetchAvailability() {
   return Object.fromEntries(data.map((row) => [row.game_key, { max: row.max_teams, taken: row.taken }]))
 }
 
+// Equipos aprobados con sus integrantes (solo apodos). Si aún no se actualizó el SQL (vista de integrantes),
+// los integrantes quedan vacíos.
 export async function fetchPublicTeams() {
   if (!isSupabaseConfigured) return []
-  const { data, error } = await supabase.from('public_teams').select('*').order('team_name')
-  if (error) throw new Error(error.message)
-  return data
+  const [t, p] = await Promise.all([
+    supabase.from('public_teams').select('*').order('team_name'),
+    supabase.from('public_team_players').select('*').order('slot'),
+  ])
+  if (t.error) throw new Error(t.error.message)
+  // Sin la vista de integrantes (falta ejecutar 01_schema.sql en Supabase) no hay apodos que mostrar.
+  if (p.error) console.warn('No se pudieron cargar los integrantes: ejecuta 01_schema.sql actualizado en Supabase.', p.error.message)
+  const players = new Map()
+  ;(p.error ? [] : p.data).forEach((row) => players.set(row.registration_id, [...(players.get(row.registration_id) ?? []), row]))
+  return t.data.map((team) => ({ ...team, players: players.get(team.id) ?? [] }))
+}
+
+// Partidos con hora, fases publicadas y eventos libres del cronograma. Si la tabla de eventos aún no existe
+// (falta actualizar el SQL), el cronograma muestra solo los partidos.
+export async function fetchSchedule() {
+  if (!isSupabaseConfigured) return { matches: [], stages: [], events: [] }
+  const [m, s, e] = await Promise.all([
+    supabase.from('public_matches').select('id, stage_id, round, team_a, team_b, team_a_name, team_b_name, best_of, status, scheduled_at').not('scheduled_at', 'is', null),
+    supabase.from('public_stages').select('id, game_key, name, type'),
+    supabase.from('schedule_events').select('*').order('starts_at'),
+  ])
+  if (m.error || s.error) throw new Error((m.error || s.error).message)
+  return { matches: m.data, stages: s.data, events: e.error ? [] : e.data }
 }
 
 export async function fetchPublishedStages() {
