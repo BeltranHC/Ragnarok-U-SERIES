@@ -334,7 +334,7 @@ h1, h2, h3 { text-wrap: balance; }
   .hero-prize-kicker { font-size: 0.54rem; }
   .hero-prize-note { font-size: 0.58rem; }
   .hero-cta-group { gap: 0.8rem; }
-  .hero-btn-primary { width: 100%; }
+  .hero-btn-primary, .hero-btn-community { width: 100%; }
   .hero-explore-link { margin: 0 auto; }
   .hero-visual { height: 365px; }
   .hero-visual-caption { padding: 0.9rem 0.8rem; gap: 0.7rem; }

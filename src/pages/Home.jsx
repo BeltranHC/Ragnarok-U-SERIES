@@ -9,6 +9,7 @@ import RegistrationSteps from '../components/RegistrationSteps'
 import useHeroRotation from '../hooks/useHeroRotation'
 import { useTournament } from '../context/TournamentContext'
 import { formatSoles } from '../lib/money'
+import { communityLink } from '../lib/whatsapp'
 
 function getTimeLeft(deadline) {
   const time = Math.max(deadline - Date.now(), 0)
@@ -65,7 +66,8 @@ function resetArtwork(event) {
 
 function Home({ heroEnabled = true }) {
   const { openRegistration, activeGame, setActiveGame, isRegistrationOpen } = useRegistration()
-  const { deadline, games: gameConfig, prizes, prizeTotal, availability } = useTournament()
+  const { deadline, games: gameConfig, prizes, prizeTotal, availability, settings } = useTournament()
+  const whatsappGroup = communityLink(settings)
   const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(deadline))
   const { game: heroGame, autoplay, selectGame: selectHeroGame, toggleAutoplay, containerRef } = useHeroRotation(activeGame, heroEnabled && !isRegistrationOpen)
   const isHeroFreeFire = heroGame === 'ff'
@@ -98,10 +100,6 @@ function Home({ heroEnabled = true }) {
         <div className="hero-content-wrapper">
           <div className="hero-layout">
             <div className="hero-copy">
-              <div className="hero-status-pill">
-                <span className="hero-status-dot" />
-                PUNO, PERÚ <span className="hero-status-separator">/</span> TEMPORADA 2026
-              </div>
               <div className="hero-grand-title">
                 <span className="hero-subkicker">TU UNIVERSIDAD. TU EQUIPO. TU ARENA.</span>
                 <h1 id="event-title">RAGNAROK<span className="hero-gradient-text">U-SERIES<span className="hero-year">26</span></span></h1>
@@ -125,9 +123,19 @@ function Home({ heroEnabled = true }) {
               </div>
               <div className="hero-cta-group">
                 <button onClick={() => handleInscribe(heroGame)} type="button" className="hero-btn-primary clip-corner">
-                  INSCRIBIR A MI EQUIPO <span aria-hidden="true">↗</span>
+                  INSCRIBIR A MI EQUIPO
                 </button>
-                <a href="#disciplinas" className="hero-explore-link" onClick={() => audio.click()}>Explorar el torneo <span aria-hidden="true">↓</span></a>
+                {whatsappGroup && (
+                  <a
+                    href={whatsappGroup}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hero-btn-community clip-corner"
+                    onClick={() => audio.click()}
+                  >
+                    ÚNETE A LA COMUNIDAD <span aria-hidden="true">↗</span>
+                  </a>
+                )}
               </div>
               <div className="hero-countdown-block">
                 <p className="hero-countdown-label">CIERRE DE INSCRIPCIONES <span>{formatDeadline(deadline)}</span></p>

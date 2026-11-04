@@ -26,49 +26,16 @@ function Footer() {
 
   return (
     <footer className="site-footer" id="comunidad">
-      <section className="community-panel" aria-labelledby="community-title">
-        <div className="community-copy">
-          <span className="section-eyebrow">05 / COMUNIDAD RAGNAROK</span>
-          <h2 id="community-title">
-            El torneo se vive <span>en equipo.</span>
-          </h2>
-          <p>
-            Encuentra escuadra, sigue las novedades y conecta con la comunidad universitaria.
-          </p>
-        </div>
-        <div className="community-action">
-          {whatsappGroup ? (
-            <a
-              className="community-join"
-              href={whatsappGroup}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => audio.click()}
-            >
-              UNIRME A WHATSAPP <Icon name="arrow-up-right" size={16} />
-            </a>
-          ) : (
-            <Link
-              className="community-join"
-              to="/#como-participar"
-              onClick={() => audio.click()}
-            >
-              VER CÓMO PARTICIPAR <Icon name="arrow-up-right" size={16} />
-            </Link>
-          )}
-          <small>El grupo oficial de capitanes se entrega al completar la inscripción.</small>
-        </div>
-      </section>
 
       <div className="footer-main-grid">
         <div className="footer-brand-col">
           <Link className="footer-brand-row" to="/">
             <img
               className="footer-context-logo"
-              src="/images/ragnarok-contexto.png"
+              src="/images/ragnarok-principal.png"
               alt="Ragnarok U-Series"
-              width="320"
-              height="100"
+              width="88"
+              height="88"
             />
             <div>
               <strong className="footer-brand-name">RAGNAROK · U-SERIES</strong>
@@ -86,7 +53,15 @@ function Footer() {
             <li><Link to="/#disciplinas">Disciplinas</Link></li>
             <li><Link to="/#premios">Premios</Link></li>
             <li><Link to="/#reglamento">Reglamento</Link></li>
-            <li><Link to="/#como-participar">Inscripción y Yape</Link></li>
+            {whatsappGroup ? (
+              <li>
+                <a href={whatsappGroup} target="_blank" rel="noopener noreferrer" onClick={() => audio.click()}>
+                  Comunidad WhatsApp
+                </a>
+              </li>
+            ) : (
+              <li><Link to="/#como-participar">Inscripción y Yape</Link></li>
+            )}
           </ul>
         </div>
 
@@ -95,7 +70,7 @@ function Footer() {
           <ul className="footer-links">
             <li><Link to="/equipos">Equipos confirmados</Link></li>
             <li><Link to="/llaves">Fixture y resultados</Link></li>
-            <li><span>Puno, Perú · Temporada 2026</span></li>
+            <li><span>Temporada 2026</span></li>
             <li><span>Cierre: {closingDate}</span></li>
           </ul>
         </div>
